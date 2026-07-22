@@ -1,0 +1,99 @@
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Dashboard Administrator{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Dashboard Administrator</h1>
+        <p class="muted">Ringkasan operasional RoseHaven Hotel.</p>
+    </div>
+    <a class="btn" href="{% url 'administrator:reports' %}">Lihat Laporan</a>
+</div>
+
+<div class="stats">
+    <div class="stat-card">
+        <div class="label">Total Kamar</div>
+        <div class="value">{{ total_rooms }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="label">Kamar Tersedia</div>
+        <div class="value">{{ available_rooms }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="label">Kamar Terisi</div>
+        <div class="value">{{ occupied_rooms }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="label">Total Pelanggan</div>
+        <div class="value">{{ total_customers }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="label">Total Reservasi</div>
+        <div class="value">{{ total_reservations }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="label">Reservasi Hari Ini</div>
+        <div class="value">{{ today_reservations }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="label">Check In Hari Ini</div>
+        <div class="value">{{ today_checkins }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="label">Pendapatan Bulan Ini</div>
+        <div class="value" style="font-size:1.25rem">{{ income_month|rupiah }}</div>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-head">
+        <h3>Reservasi Terbaru</h3>
+        <a href="{% url 'administrator:reservation_list' %}">Lihat semua</a>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Kode</th>
+                    <th>Customer</th>
+                    <th>Kamar</th>
+                    <th>Check In</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for r in recent %}
+                <tr>
+                    <td>{{ r.code }}</td>
+                    <td>{{ r.customer.get_full_name|default:r.customer.username }}</td>
+                    <td>{{ r.room.number }}</td>
+                    <td>{{ r.check_in|date:'d-m-Y' }}</td>
+                    <td>
+                        <span class="badge badge-{{ r.status|status_class }}">
+                            {{ r.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ r.total|rupiah }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty">Belum ada reservasi.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

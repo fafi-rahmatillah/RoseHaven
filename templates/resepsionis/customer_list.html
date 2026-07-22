@@ -1,0 +1,44 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Data Customer{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Data Customer</h1>
+        <p class="muted">Data pelanggan yang dapat dilihat oleh resepsionis.</p>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>No. HP</th>
+                    <th>Alamat</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td>{{ u.get_full_name|default:'-' }}</td>
+                    <td>{{ u.username }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>{{ u.customer_profile.phone|default:'-' }}</td>
+                    <td>{{ u.customer_profile.address|default:'-' }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty">Belum ada customer.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

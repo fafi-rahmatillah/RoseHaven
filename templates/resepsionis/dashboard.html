@@ -1,0 +1,79 @@
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Dashboard Resepsionis{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Dashboard Resepsionis</h1>
+        <p class="muted">Operasional reservasi, pembayaran, check in, dan check out.</p>
+    </div>
+    <a class="btn" href="{% url 'resepsionis:walk_in_add' %}">＋ Reservasi Langsung</a>
+</div>
+
+<div class="stats">
+    <div class="stat-card">
+        <div class="label">Reservasi Baru</div>
+        <div class="value">{{ new_reservations }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="label">Menunggu Pembayaran</div>
+        <div class="value">{{ waiting_payments }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="label">Check In Hari Ini</div>
+        <div class="value">{{ today_checkins }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="label">Check Out Hari Ini</div>
+        <div class="value">{{ today_checkouts }}</div>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-head">
+        <h3>Reservasi Terbaru</h3>
+        <a href="{% url 'resepsionis:reservation_list' %}">Lihat semua</a>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Kode</th>
+                    <th>Customer</th>
+                    <th>Kamar</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for r in recent %}
+                <tr>
+                    <td>{{ r.code }}</td>
+                    <td>{{ r.customer.get_full_name|default:r.customer.username }}</td>
+                    <td>{{ r.room.number }}</td>
+                    <td>{{ r.check_in|date:'d-m-Y' }}</td>
+                    <td>{{ r.check_out|date:'d-m-Y' }}</td>
+                    <td>
+                        <span class="badge badge-{{ r.status|status_class }}">
+                            {{ r.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty">Belum ada reservasi.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

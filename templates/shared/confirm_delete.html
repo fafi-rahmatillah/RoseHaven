@@ -1,0 +1,18 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="form-card center">
+    <h1 style="font-family:Georgia,serif;color:var(--burgundy)">{{ title }}</h1>
+
+    <p>Apakah Anda yakin ingin menghapus <strong>{{ object }}</strong>?</p>
+    <p class="muted">Tindakan ini mungkin tidak dapat dibatalkan.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button class="btn btn-danger" type="submit">Ya, Hapus</button>
+        <a class="btn btn-secondary" href="{% url back_url %}">Batal</a>
+    </form>
+</div>
+{% endblock %}

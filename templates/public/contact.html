@@ -1,0 +1,61 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Kontak RoseHaven{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <div class="eyebrow">Kontak</div>
+        <h1>Kami siap membantu Anda.</h1>
+        <p>Hubungi tim RoseHaven untuk informasi kamar, reservasi, pembayaran, atau kebutuhan khusus.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container grid grid-2">
+        <div class="card">
+            <div class="card-body">
+                <h2 style="color:var(--burgundy)">Informasi Hotel</h2>
+
+                <p>
+                    <strong>Alamat</strong><br>
+                    {{ hotel.address }}
+                </p>
+
+                <p>
+                    <strong>Telepon</strong><br>
+                    {{ hotel.phone }}
+                </p>
+
+                <p>
+                    <strong>Email</strong><br>
+                    {{ hotel.email }}
+                </p>
+            </div>
+        </div>
+
+        <form class="form-card" method="post">
+            {% csrf_token %}
+
+            <h2 style="color:var(--burgundy)">Kirim Pesan</h2>
+
+            <div class="form-group">
+                <label>Nama</label>
+                <input required name="name">
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input required type="email" name="email">
+            </div>
+
+            <div class="form-group">
+                <label>Pesan</label>
+                <textarea required name="message" rows="5"></textarea>
+            </div>
+
+            <button class="btn" type="submit">Kirim Pesan</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

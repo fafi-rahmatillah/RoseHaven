@@ -1,0 +1,61 @@
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Konfirmasi Pembayaran{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Konfirmasi Pembayaran</h1>
+        <p class="muted">Periksa bukti transfer kemudian verifikasi atau tolak pembayaran.</p>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Reservasi</th>
+                    <th>Customer</th>
+                    <th>Kamar</th>
+                    <th>Jumlah</th>
+                    <th>Bukti</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td>{{ p.reservation.code }}</td>
+                    <td>{{ p.reservation.customer.get_full_name|default:p.reservation.customer.username }}</td>
+                    <td>{{ p.reservation.room.number }}</td>
+                    <td>{{ p.amount|rupiah }}</td>
+                    <td>
+                        {% if p.proof %}
+                        <a target="_blank" href="{{ p.proof.url }}">Lihat Bukti</a>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge badge-{{ p.status|status_class }}">
+                            {{ p.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <a class="btn btn-sm" href="{% url 'resepsionis:verify_payment' p.pk %}">Verifikasi</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="empty">Belum ada pembayaran.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Data Pembayaran{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Data Pembayaran</h1>
+        <p class="muted">Kelola bukti transfer dan status verifikasi.</p>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Reservasi</th>
+                    <th>Customer</th>
+                    <th>Jumlah</th>
+                    <th>Bukti</th>
+                    <th>Status</th>
+                    <th>Verifikator</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td>{{ p.reservation.code }}</td>
+                    <td>{{ p.reservation.customer.get_full_name|default:p.reservation.customer.username }}</td>
+                    <td>{{ p.amount|rupiah }}</td>
+                    <td>
+                        {% if p.proof %}
+                        <a target="_blank" href="{{ p.proof.url }}">Lihat Bukti</a>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge badge-{{ p.status|status_class }}">
+                            {{ p.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ p.verified_by.get_full_name|default:p.verified_by.username|default:'-' }}</td>
+                    <td>
+                        <div class="actions">
+                            <a class="btn btn-sm" href="{% url 'administrator:payment_edit' p.pk %}">Edit</a>
+                            <a class="btn btn-danger btn-sm" href="{% url 'administrator:payment_delete' p.pk %}">Hapus</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="empty">Belum ada pembayaran.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

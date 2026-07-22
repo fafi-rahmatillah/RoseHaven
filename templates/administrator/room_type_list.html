@@ -1,0 +1,55 @@
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Data Tipe Kamar{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Data Tipe Kamar</h1>
+        <p class="muted">Kelola tipe, kapasitas, ukuran, tempat tidur, dan harga dasar.</p>
+    </div>
+    <a class="btn" href="{% url 'administrator:room_type_add' %}">＋ Tambah Tipe</a>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Harga Dasar</th>
+                    <th>Kapasitas</th>
+                    <th>Tempat Tidur</th>
+                    <th>Luas</th>
+                    <th>Jumlah Kamar</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.base_price|rupiah }}</td>
+                    <td>{{ item.capacity }}</td>
+                    <td>{{ item.bed_type }}</td>
+                    <td>{{ item.size_m2 }} m²</td>
+                    <td>{{ item.room_count }}</td>
+                    <td>
+                        <div class="actions">
+                            <a class="btn btn-sm" href="{% url 'administrator:room_type_edit' item.pk %}">Edit</a>
+                            <a class="btn btn-danger btn-sm" href="{% url 'administrator:room_type_delete' item.pk %}">Hapus</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="empty">Belum ada tipe kamar.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

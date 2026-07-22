@@ -1,0 +1,182 @@
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}
+    Dashboard Customer
+{% endblock %}
+
+{% block content %}
+    <div class="page-title">
+        <div>
+            <h1>Halo, {{ user.get_full_name|default:user.username }}</h1>
+            <p class="muted">
+                Kelola reservasi dan pengalaman menginap Anda.
+            </p>
+        </div>
+
+        <a class="btn" href="{% url 'customer:reserve' %}">
+            ＋ Reservasi Baru
+        </a>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="label">Reservasi Aktif</div>
+            <div class="value">
+                {% if active %}
+                    1
+                {% else %}
+                    0
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="label">Status Terakhir</div>
+            <div class="value" style="font-size:1.15rem">
+                {% if active %}
+                    {{ active.get_status_display }}
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="label">Total Reservasi</div>
+            <div class="value">
+                {{ user.hotel_reservations.count }}
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="label">Akses Cepat</div>
+            <a
+                href="{% url 'customer:rooms' %}"
+                style="color:var(--burgundy);font-weight:800"
+            >
+                Lihat kamar →
+            </a>
+        </div>
+    </div>
+
+    {% if active %}
+        <div class="card" style="margin-bottom:24px">
+            <div class="card-body">
+                <div class="page-title">
+                    <div>
+                        <h2 style="color:var(--burgundy);margin:0">
+                            Reservasi Aktif
+                        </h2>
+                        <p class="muted">{{ active.code }}</p>
+                    </div>
+
+                    <span class="badge badge-{{ active.status|status_class }}">
+                        {{ active.get_status_display }}
+                    </span>
+                </div>
+
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <small>Kamar</small>
+                        <strong>
+                            {{ active.room.name }} ({{ active.room.number }})
+                        </strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <small>Tanggal</small>
+                        <strong>
+                            {{ active.check_in|date:'d M Y' }} -
+                            {{ active.check_out|date:'d M Y' }}
+                        </strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <small>Total</small>
+                        <strong>{{ active.total|rupiah }}</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <small>Jumlah tamu</small>
+                        <strong>{{ active.guests }} orang</strong>
+                    </div>
+                </div>
+
+                <div style="margin-top:16px">
+                    <a
+                        class="btn btn-sm"
+                        href="{% url 'customer:reservation_detail' active.pk %}"
+                    >
+                        Lihat Detail
+                    </a>
+
+                    {% if active.status == 'WAITING_PAYMENT' or active.status == 'PAID' %}
+                        <a
+                            class="btn btn-gold btn-sm"
+                            href="{% url 'customer:payment_upload' active.pk %}"
+                        >
+                            Pembayaran
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="table-card">
+        <div class="table-head">
+            <h3>Riwayat Terbaru</h3>
+            <a href="{% url 'customer:history' %}">
+                Lihat semua
+            </a>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kode</th>
+                        <th>Kamar</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Detail</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in reservations %}
+                        <tr>
+                            <td>{{ item.code }}</td>
+                            <td>{{ item.room.name }}</td>
+                            <td>{{ item.check_in|date:'d-m-Y' }}</td>
+                            <td>{{ item.check_out|date:'d-m-Y' }}</td>
+                            <td>{{ item.total|rupiah }}</td>
+                            <td>
+                                <span class="badge badge-{{ item.status|status_class }}">
+                                    {{ item.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <a
+                                    class="btn btn-sm"
+                                    href="{% url 'customer:reservation_detail' item.pk %}"
+                                >
+                                    Detail
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="empty">
+                                Belum ada reservasi.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

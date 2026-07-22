@@ -1,0 +1,26 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Profil Saya{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Profil Saya</h1>
+        <p class="muted">Perbarui nama, email, nomor HP, dan alamat.</p>
+    </div>
+</div>
+
+<form class="form-card" method="post">
+    {% csrf_token %}
+
+    {% for field in form %}
+    <div class="form-group">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {{ field.errors }}
+    </div>
+    {% endfor %}
+
+    <button class="btn" type="submit">Simpan Profil</button>
+</form>
+{% endblock %}

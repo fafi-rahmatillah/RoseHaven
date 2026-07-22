@@ -1,0 +1,74 @@
+{% extends 'base_public.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}{{ room.name }} - RoseHaven{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container split">
+        <div class="card room-card">
+            <div class="room-image" style="height:440px">
+                {% if room.image %}
+                <img src="{{ room.image.url }}" alt="{{ room.name }}">
+                {% else %}
+                <div class="room-placeholder">RoseHaven {{ room.number }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div>
+            <span class="badge badge-{{ room.status|status_class }}">
+                {{ room.get_status_display }}
+            </span>
+
+            <div class="eyebrow text-gold" style="margin-top:14px">
+                Kamar {{ room.number }} • {{ room.room_type.name }}
+            </div>
+
+            <h1 style="font-family:Georgia,serif;color:var(--burgundy);font-size:3rem;margin:10px 0">
+                {{ room.name }}
+            </h1>
+
+            <p>{{ room.description|default:room.room_type.description }}</p>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <small>Harga</small>
+                    <strong>{{ room.price|rupiah }} / malam</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Kapasitas</small>
+                    <strong>{{ room.room_type.capacity }} tamu</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Luas</small>
+                    <strong>{{ room.room_type.size_m2 }} m²</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Tempat tidur</small>
+                    <strong>{{ room.room_type.bed_type }}</strong>
+                </div>
+            </div>
+
+            <h3>Fasilitas</h3>
+
+            <div class="facilities">
+                {% for f in room.facilities.all %}
+                <span class="facility-chip">{{ f.icon }} {{ f.name }}</span>
+                {% empty %}
+                <span class="muted">Fasilitas belum dicantumkan.</span>
+                {% endfor %}
+            </div>
+
+            {% if user.is_authenticated %}
+            <a class="btn" href="{% url 'customer:reserve_room' room.pk %}">Pesan Kamar</a>
+            {% else %}
+            <a class="btn" href="{% url 'login' %}">Login untuk Memesan</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

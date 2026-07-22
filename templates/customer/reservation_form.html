@@ -1,0 +1,32 @@
+```html
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Reservasi Kamar{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Reservasi Kamar</h1>
+        <p class="muted">Pilih kamar, tanggal check in/check out, dan jumlah tamu.</p>
+    </div>
+</div>
+
+<form class="form-card" method="post">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        {{ form.non_field_errors }}
+    {% endif %}
+
+    {% for field in form %}
+    <div class="form-group">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {{ field.errors }}
+    </div>
+    {% endfor %}
+
+    <button class="btn" type="submit">Simpan Reservasi</button>
+</form>
+{% endblock %}
+```

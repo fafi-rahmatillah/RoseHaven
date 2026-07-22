@@ -1,0 +1,51 @@
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Jadwal Reservasi{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Jadwal Reservasi</h1>
+        <p class="muted">Jadwal penggunaan kamar berdasarkan tanggal check in dan check out.</p>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Tanggal Check In</th>
+                    <th>Tanggal Check Out</th>
+                    <th>Kamar</th>
+                    <th>Customer</th>
+                    <th>Jumlah Tamu</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for r in reservations %}
+                <tr>
+                    <td>{{ r.check_in|date:'d M Y' }}</td>
+                    <td>{{ r.check_out|date:'d M Y' }}</td>
+                    <td>{{ r.room.number }} - {{ r.room.name }}</td>
+                    <td>{{ r.customer.get_full_name|default:r.customer.username }}</td>
+                    <td>{{ r.guests }}</td>
+                    <td>
+                        <span class="badge badge-{{ r.status|status_class }}">
+                            {{ r.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty">Belum ada jadwal reservasi.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

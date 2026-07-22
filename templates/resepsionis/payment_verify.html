@@ -1,0 +1,64 @@
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Verifikasi Pembayaran{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Verifikasi Pembayaran</h1>
+        <p class="muted">Reservasi {{ payment.reservation.code }}</p>
+    </div>
+    <a class="btn btn-secondary" href="{% url 'resepsionis:payment_list' %}">Kembali</a>
+</div>
+
+<div class="grid grid-2">
+    <div class="card">
+        <div class="card-body">
+            <h2 style="color:var(--burgundy)">Detail Pembayaran</h2>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <small>Customer</small>
+                    <strong>{{ payment.reservation.customer.get_full_name|default:payment.reservation.customer.username }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Jumlah</small>
+                    <strong>{{ payment.amount|rupiah }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Kamar</small>
+                    <strong>{{ payment.reservation.room.number }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Tanggal</small>
+                    <strong>{{ payment.paid_at|date:'d M Y H:i' }}</strong>
+                </div>
+            </div>
+
+            {% if payment.proof %}
+            <p>
+                <a class="btn btn-outline" target="_blank" href="{{ payment.proof.url }}">Buka Bukti Transfer</a>
+            </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <form class="form-card" method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+        </div>
+        {% endfor %}
+
+        <button class="btn" type="submit">Simpan Verifikasi</button>
+    </form>
+</div>
+{% endblock %}

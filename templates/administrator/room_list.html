@@ -1,0 +1,67 @@
+```html
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Data Kamar{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Data Kamar</h1>
+        <p class="muted">CRUD kamar, harga, status, foto, dan fasilitas.</p>
+    </div>
+    <a class="btn" href="{% url 'administrator:room_add' %}">＋ Tambah Kamar</a>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>Nomor</th>
+                    <th>Nama Kamar</th>
+                    <th>Tipe</th>
+                    <th>Harga</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for r in rooms %}
+                <tr>
+                    <td>
+                        {% if r.image %}
+                        <img src="{{ r.image.url }}" style="width:70px;height:48px;object-fit:cover;border-radius:7px">
+                        {% else %}
+                        <div style="width:70px;height:48px;background:var(--burgundy);border-radius:7px"></div>
+                        {% endif %}
+                    </td>
+                    <td>{{ r.number }}</td>
+                    <td>{{ r.name }}</td>
+                    <td>{{ r.room_type.name }}</td>
+                    <td>{{ r.price|rupiah }}</td>
+                    <td>
+                        <span class="badge badge-{{ r.status|status_class }}">
+                            {{ r.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <a class="btn btn-sm" href="{% url 'administrator:room_edit' r.pk %}">Edit</a>
+                            <a class="btn btn-danger btn-sm" href="{% url 'administrator:room_delete' r.pk %}">Hapus</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="empty">Belum ada kamar.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+```

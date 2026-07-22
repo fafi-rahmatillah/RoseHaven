@@ -1,0 +1,114 @@
+{% load static %}
+
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{% block title %}Dashboard RoseHaven{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <div class="dashboard-shell">
+        <aside class="sidebar">
+            <a class="brand" href="{% url 'role_redirect' %}">
+                <span class="brand-mark">R</span>
+                <span>RoseHaven</span>
+            </a>
+
+            <div class="role-label">
+                {% if is_administrator %}
+                Administrator
+                {% elif is_resepsionis %}
+                Resepsionis
+                {% else %}
+                Customer
+                {% endif %}
+            </div>
+
+            <nav class="side-menu">
+                {% if is_administrator %}
+                <a href="{% url 'administrator:dashboard' %}">▦ Dashboard</a>
+                <a href="{% url 'administrator:room_list' %}">▣ Data Kamar</a>
+                <a href="{% url 'administrator:room_type_list' %}">◫ Data Tipe Kamar</a>
+                <a href="{% url 'administrator:facility_list' %}">✦ Data Fasilitas</a>
+                <a href="{% url 'administrator:customer_list' %}">♙ Data Customer</a>
+                <a href="{% url 'administrator:reservation_list' %}">▤ Data Reservasi</a>
+                <a href="{% url 'administrator:payment_list' %}">◈ Data Pembayaran</a>
+                <a href="{% url 'administrator:receptionist_list' %}">♜ Data Resepsionis</a>
+                <a href="{% url 'administrator:reports' %}">▥ Laporan</a>
+                <a href="{% url 'administrator:settings' %}">⚙ Pengaturan Akun</a>
+
+                {% elif is_resepsionis %}
+                <a href="{% url 'resepsionis:dashboard' %}">▦ Dashboard</a>
+                <a href="{% url 'resepsionis:reservation_list' %}">▤ Data Reservasi</a>
+                <a href="{% url 'resepsionis:customer_list' %}">♙ Data Customer</a>
+                <a href="{% url 'resepsionis:room_list' %}">▣ Data Kamar</a>
+                <a href="{% url 'resepsionis:payment_list' %}">◈ Konfirmasi Pembayaran</a>
+                <a href="{% url 'resepsionis:check_in_list' %}">↳ Check In</a>
+                <a href="{% url 'resepsionis:check_out_list' %}">↲ Check Out</a>
+                <a href="{% url 'resepsionis:schedule' %}">▦ Jadwal Reservasi</a>
+
+                {% else %}
+                <a href="{% url 'customer:dashboard' %}">▦ Dashboard</a>
+                <a href="{% url 'customer:profile' %}">♙ Profil Saya</a>
+                <a href="{% url 'customer:rooms' %}">▣ Daftar Kamar</a>
+                <a href="{% url 'customer:reserve' %}">＋ Reservasi Kamar</a>
+                <a href="{% url 'customer:history' %}">▤ Riwayat Reservasi</a>
+                {% endif %}
+            </nav>
+
+            <div class="sidebar-bottom">
+                <a class="btn btn-light btn-block" href="{% url 'home' %}">Lihat Website</a>
+                <a class="btn btn-gold btn-block" style="margin-top:8px" href="{% url 'logout' %}">Logout</a>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <button class="mobile-sidebar-toggle">☰</button>
+
+                <h2>{% block topbar %}RoseHaven Management{% endblock %}</h2>
+
+                <div class="user-badge">
+                    <div class="avatar">
+                        {{ user.first_name|default:user.username|slice:':1'|upper }}
+                    </div>
+
+                    <div>
+                        <strong>{{ user.get_full_name|default:user.username }}</strong>
+
+                        <div class="muted" style="font-size:.78rem">
+                            {% if is_administrator %}
+                            Administrator
+                            {% elif is_resepsionis %}
+                            Resepsionis
+                            {% else %}
+                            Customer
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {% if messages %}
+            <div class="alerts">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="content">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

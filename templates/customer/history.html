@@ -1,0 +1,53 @@
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Riwayat Reservasi{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Riwayat Reservasi</h1>
+        <p class="muted">Seluruh reservasi yang pernah Anda buat.</p>
+    </div>
+    <a class="btn" href="{% url 'customer:reserve' %}">Reservasi Baru</a>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Kode Reservasi</th>
+                    <th>Nama Kamar</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Detail</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reservations %}
+                <tr>
+                    <td>{{ r.code }}</td>
+                    <td>{{ r.room.name }}</td>
+                    <td>{{ r.check_in|date:'d-m-Y' }}</td>
+                    <td>{{ r.check_out|date:'d-m-Y' }}</td>
+                    <td>{{ r.total|rupiah }}</td>
+                    <td>
+                        <span class="badge badge-{{ r.status|status_class }}">{{ r.get_status_display }}</span>
+                    </td>
+                    <td>
+                        <a class="btn btn-sm" href="{% url 'customer:reservation_detail' r.pk %}">Detail</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="empty">Belum ada reservasi.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

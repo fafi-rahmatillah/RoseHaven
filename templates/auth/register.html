@@ -1,0 +1,41 @@
+```html
+{% extends 'base_public.html' %}
+
+{% block title %}Registrasi Customer{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+    <form class="auth-card" style="width:min(620px,100%)" method="post">
+        {% csrf_token %}
+
+        <div class="eyebrow text-gold">Akun Customer</div>
+        <h1>Buat akun RoseHaven.</h1>
+        <p class="muted">Isi data untuk mulai melakukan reservasi.</p>
+
+        {% if form.non_field_errors %}
+        {{ form.non_field_errors }}
+        {% endif %}
+
+        {% for field in form %}
+        <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+
+            {% if field.help_text %}
+            <span class="helptext">{{ field.help_text }}</span>
+            {% endif %}
+
+            {{ field.errors }}
+        </div>
+        {% endfor %}
+
+        <button class="btn btn-block" type="submit">Registrasi</button>
+
+        <p class="center muted">
+            Sudah punya akun?
+            <a style="color:var(--burgundy);font-weight:700" href="{% url 'login' %}">Login</a>
+        </p>
+    </form>
+</div>
+{% endblock %}
+```

@@ -1,0 +1,74 @@
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Data Reservasi{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Data Reservasi</h1>
+        <p class="muted">Kelola seluruh reservasi dan status operasional.</p>
+    </div>
+    <a class="btn" href="{% url 'administrator:reservation_add' %}">＋ Tambah Reservasi</a>
+</div>
+
+<form class="filter-bar" method="get">
+    <div class="form-group">
+        <label>Status</label>
+        <select name="status">
+            <option value="">Semua Status</option>
+            {% for value,label in statuses %}
+            <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button class="btn" type="submit">Filter</button>
+</form>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Kode</th>
+                    <th>Customer</th>
+                    <th>Kamar</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for r in reservations %}
+                <tr>
+                    <td>{{ r.code }}</td>
+                    <td>{{ r.customer.get_full_name|default:r.customer.username }}</td>
+                    <td>{{ r.room.number }}</td>
+                    <td>{{ r.check_in|date:'d-m-Y' }}</td>
+                    <td>{{ r.check_out|date:'d-m-Y' }}</td>
+                    <td>
+                        <span class="badge badge-{{ r.status|status_class }}">
+                            {{ r.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ r.total|rupiah }}</td>
+                    <td>
+                        <div class="actions">
+                            <a class="btn btn-sm" href="{% url 'administrator:reservation_edit' r.pk %}">Edit</a>
+                            <a class="btn btn-danger btn-sm" href="{% url 'administrator:reservation_delete' r.pk %}">Hapus</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="empty">Belum ada reservasi.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

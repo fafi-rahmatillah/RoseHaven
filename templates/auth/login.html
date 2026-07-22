@@ -1,0 +1,33 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Login RoseHaven{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+    <form class="auth-card" method="post">
+        {% csrf_token %}
+
+        <div class="eyebrow text-gold">Masuk ke akun</div>
+
+        <h1>Selamat datang kembali.</h1>
+        <p class="muted">Login sebagai Administrator, Resepsionis, atau Customer.</p>
+
+        {% for field in form %}
+        <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+        </div>
+        {% endfor %}
+
+        <button class="btn btn-block" type="submit">Login</button>
+
+        <p class="center muted">
+            Belum punya akun?
+            <a style="color:var(--burgundy);font-weight:700" href="{% url 'register' %}">
+                Registrasi
+            </a>
+        </p>
+    </form>
+</div>
+{% endblock %}

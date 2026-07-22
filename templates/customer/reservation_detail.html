@@ -1,0 +1,101 @@
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Detail Reservasi{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Detail Reservasi</h1>
+        <p class="muted">{{ reservation.code }}</p>
+    </div>
+    <span class="badge badge-{{ reservation.status|status_class }}">
+        {{ reservation.get_status_display }}
+    </span>
+</div>
+
+<div class="grid grid-2">
+    <div class="card">
+        <div class="card-body">
+            <h2 style="color:var(--burgundy)">Informasi Menginap</h2>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <small>Kamar</small>
+                    <strong>{{ reservation.room.name }} ({{ reservation.room.number }})</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Tipe kamar</small>
+                    <strong>{{ reservation.room.room_type.name }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Check In</small>
+                    <strong>{{ reservation.check_in|date:'d M Y' }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Check Out</small>
+                    <strong>{{ reservation.check_out|date:'d M Y' }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Jumlah malam</small>
+                    <strong>{{ reservation.nights }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Jumlah tamu</small>
+                    <strong>{{ reservation.guests }}</strong>
+                </div>
+            </div>
+
+            <p><strong>Catatan:</strong> {{ reservation.notes|default:'-' }}</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h2 style="color:var(--burgundy)">Pembayaran</h2>
+
+            <div class="detail-item">
+                <small>Total</small>
+                <strong style="font-size:1.45rem">{{ reservation.total|rupiah }}</strong>
+            </div>
+
+            {% if reservation.payment %}
+            <p>
+                Status pembayaran:
+                <span class="badge badge-{{ reservation.payment.status|status_class }}">
+                    {{ reservation.payment.get_status_display }}
+                </span>
+            </p>
+
+            {% if reservation.payment.proof %}
+            <p>
+                <a target="_blank" href="{{ reservation.payment.proof.url }}">
+                    Lihat bukti pembayaran
+                </a>
+            </p>
+            {% endif %}
+            {% else %}
+            <p class="muted">Belum ada bukti pembayaran.</p>
+            {% endif %}
+
+            {% if reservation.status == 'WAITING_PAYMENT' or reservation.status == 'PAID' %}
+            <a class="btn" href="{% url 'customer:payment_upload' reservation.pk %}">
+                Upload Bukti Pembayaran
+            </a>
+            {% endif %}
+
+            {% if reservation.status == 'WAITING_PAYMENT' %}
+            <form method="post" action="{% url 'customer:cancel_reservation' reservation.pk %}" style="margin-top:10px">
+                {% csrf_token %}
+                <button class="btn btn-danger" type="submit">Batalkan Reservasi</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

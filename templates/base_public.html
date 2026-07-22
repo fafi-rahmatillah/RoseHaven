@@ -1,0 +1,86 @@
+{% load static %}
+
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{% block title %}RoseHaven Hotel{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <nav class="public-nav">
+        <div class="container inner">
+            <a class="brand" href="{% url 'home' %}">
+                <span class="brand-mark">R</span>
+                <span>RoseHaven</span>
+            </a>
+
+            <button class="menu-toggle" aria-label="Menu">☰</button>
+
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Beranda</a>
+                <a href="{% url 'about' %}">Tentang</a>
+                <a href="{% url 'public_rooms' %}">Daftar Kamar</a>
+                <a href="{% url 'contact' %}">Kontak</a>
+            </div>
+
+            <div class="nav-actions">
+                {% if user.is_authenticated %}
+                <a class="btn btn-light btn-sm" href="{% url 'role_redirect' %}">Dashboard</a>
+                <a class="btn btn-gold btn-sm" href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                <a class="btn btn-light btn-sm" href="{% url 'login' %}">Login</a>
+                <a class="btn btn-gold btn-sm" href="{% url 'register' %}">Registrasi</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    {% if messages %}
+    <div class="alerts">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <a class="brand" href="{% url 'home' %}">
+                        <span class="brand-mark">R</span>
+                        <span>RoseHaven</span>
+                    </a>
+                    <p>{{ hotel.description|default:'Hotel bintang 4 dengan pelayanan hangat dan pengalaman menginap elegan.' }}</p>
+                </div>
+
+                <div>
+                    <h3>Navigasi</h3>
+                    <p><a href="{% url 'about' %}">Tentang Hotel</a></p>
+                    <p><a href="{% url 'public_rooms' %}">Daftar Kamar</a></p>
+                    <p><a href="{% url 'contact' %}">Kontak</a></p>
+                </div>
+
+                <div>
+                    <h3>Hubungi Kami</h3>
+                    <p>{{ hotel.phone|default:'+62 812-3456-7890' }}</p>
+                    <p>{{ hotel.email|default:'hello@rosehaven.test' }}</p>
+                    <p>{{ hotel.address|default:'Indonesia' }}</p>
+                </div>
+            </div>
+
+            <small>© {% now 'Y' %} RoseHaven Hotel. Aplikasi Reservasi Django.</small>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

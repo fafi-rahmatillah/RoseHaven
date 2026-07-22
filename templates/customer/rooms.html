@@ -1,0 +1,48 @@
+```html
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Daftar Kamar{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Daftar Kamar</h1>
+        <p class="muted">Pilih kamar sesuai kebutuhan Anda.</p>
+    </div>
+</div>
+
+<div class="grid grid-3">
+    {% for room in rooms %}
+    <article class="card room-card">
+        <div class="room-image">
+            {% if room.image %}
+            <img src="{{ room.image.url }}" alt="{{ room.name }}">
+            {% else %}
+            <div class="room-placeholder">RoseHaven {{ room.number }}</div>
+            {% endif %}
+        </div>
+
+        <div class="card-body">
+            <span class="badge badge-{{ room.status|status_class }}">
+                {{ room.get_status_display }}
+            </span>
+
+            <h3>{{ room.name }}</h3>
+            <p class="muted">{{ room.room_type.name }} • {{ room.room_type.capacity }} tamu</p>
+
+            <div class="room-price">{{ room.price|rupiah }}</div>
+
+            <div class="actions" style="margin-top:14px">
+                <a class="btn btn-outline btn-sm" href="{% url 'customer:room_detail' room.pk %}">Detail</a>
+                <a class="btn btn-sm" href="{% url 'customer:reserve_room' room.pk %}">Reservasi</a>
+            </div>
+        </div>
+    </article>
+
+    {% empty %}
+    <div class="empty">Belum ada kamar tersedia.</div>
+    {% endfor %}
+</div>
+{% endblock %}
+```

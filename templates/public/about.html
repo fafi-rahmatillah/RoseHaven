@@ -1,0 +1,53 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Tentang RoseHaven{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <div class="eyebrow">Tentang Hotel</div>
+        <h1>Keramahan yang tumbuh di setiap sudut.</h1>
+        <p>RoseHaven menghadirkan perpaduan kenyamanan modern, nuansa elegan, dan pelayanan personal.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container split">
+        <div>
+            <h2 style="font-family:Georgia,serif;color:var(--burgundy);font-size:2.4rem">
+                RoseHaven Hotel
+            </h2>
+            <p>{{ hotel.description }}</p>
+            <p>Kami merancang perjalanan tamu dari reservasi hingga check out agar sederhana, transparan, dan nyaman. Setiap kamar dipelihara dengan standar tinggi dan didukung fasilitas pilihan.</p>
+        </div>
+
+        <div class="luxury-panel">
+            <h3>Nilai Kami</h3>
+
+            <div class="feature">
+                <span class="feature-icon">1</span>
+                <div>
+                    <strong>Kenyamanan</strong>
+                    <div>Ruang istirahat yang tenang dan tertata.</div>
+                </div>
+            </div>
+
+            <div class="feature">
+                <span class="feature-icon">2</span>
+                <div>
+                    <strong>Kepercayaan</strong>
+                    <div>Informasi kamar, harga, dan pembayaran yang transparan.</div>
+                </div>
+            </div>
+
+            <div class="feature">
+                <span class="feature-icon">3</span>
+                <div>
+                    <strong>Keramahan</strong>
+                    <div>Pelayanan tulus sejak reservasi hingga kepulangan.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base_public.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Daftar Kamar RoseHaven{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <div class="eyebrow">Daftar Kamar</div>
+        <h1>Pilih ruang terbaik untuk Anda.</h1>
+        <p>Lihat tipe, fasilitas, kapasitas, harga, dan status kamar sebelum memesan.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <form class="filter-bar" method="get">
+            <div class="form-group" style="flex:1">
+                <label>Cari kamar</label>
+                <input name="q" value="{{ q }}" placeholder="Nama, nomor, atau tipe kamar">
+            </div>
+            <button class="btn" type="submit">Cari</button>
+        </form>
+
+        <div class="grid grid-3">
+            {% for room in rooms %}
+            <article class="card room-card">
+                <div class="room-image">
+                    {% if room.image %}
+                    <img src="{{ room.image.url }}" alt="{{ room.name }}">
+                    {% else %}
+                    <div class="room-placeholder">RoseHaven {{ room.number }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <span class="badge badge-{{ room.status|status_class }}">
+                        {{ room.get_status_display }}
+                    </span>
+
+                    <h3>{{ room.name }}</h3>
+                    <p class="muted">{{ room.room_type.name }} • kapasitas {{ room.room_type.capacity }} tamu</p>
+
+                    <div class="room-price">
+                        {{ room.price|rupiah }} <small class="muted">/ malam</small>
+                    </div>
+
+                    <div class="facilities">
+                        {% for facility in room.facilities.all|slice:':3' %}
+                        <span class="facility-chip">{{ facility.icon }} {{ facility.name }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <a class="btn btn-outline btn-block" href="{% url 'public_room_detail' room.pk %}">
+                        Detail Kamar
+                    </a>
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty">Tidak ada kamar ditemukan.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

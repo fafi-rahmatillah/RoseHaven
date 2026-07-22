@@ -1,0 +1,72 @@
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Detail Kamar{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>{{ room.name }}</h1>
+        <p class="muted">Kamar {{ room.number }} • {{ room.room_type.name }}</p>
+    </div>
+    <a class="btn" href="{% url 'customer:reserve_room' room.pk %}">Pesan Kamar</a>
+</div>
+
+<div class="grid grid-2">
+    <div class="card room-card">
+        <div class="room-image" style="height:420px">
+            {% if room.image %}
+            <img src="{{ room.image.url }}" alt="{{ room.name }}">
+            {% else %}
+            <div class="room-placeholder">RoseHaven {{ room.number }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <span class="badge badge-{{ room.status|status_class }}">
+                {{ room.get_status_display }}
+            </span>
+
+            <h2 style="color:var(--burgundy)">
+                {{ room.price|rupiah }} <small class="muted">/ malam</small>
+            </h2>
+
+            <p>{{ room.description|default:room.room_type.description }}</p>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <small>Kapasitas</small>
+                    <strong>{{ room.room_type.capacity }} tamu</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Luas</small>
+                    <strong>{{ room.room_type.size_m2 }} m²</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Tempat tidur</small>
+                    <strong>{{ room.room_type.bed_type }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Tipe</small>
+                    <strong>{{ room.room_type.name }}</strong>
+                </div>
+            </div>
+
+            <h3>Fasilitas</h3>
+
+            <div class="facilities">
+                {% for f in room.facilities.all %}
+                <span class="facility-chip">{{ f.icon }} {{ f.name }}</span>
+                {% empty %}
+                <span class="muted">Belum ada data.</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

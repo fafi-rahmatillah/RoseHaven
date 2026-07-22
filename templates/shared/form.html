@@ -1,0 +1,38 @@
+```html
+{% extends 'base_dashboard.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>{{ title }}</h1>
+        <p class="muted">Lengkapi data berikut dengan benar.</p>
+    </div>
+    <a class="btn btn-secondary" href="{% url back_url %}">Kembali</a>
+</div>
+
+<form class="form-card" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    {{ form.non_field_errors }}
+    {% endif %}
+
+    {% for field in form %}
+    <div class="form-group {% if field.field.widget.input_type == 'checkbox' %}checkbox-group{% endif %}">
+        <label>{{ field.label }}</label>
+        {{ field }}
+
+        {% if field.help_text %}
+        <span class="helptext">{{ field.help_text }}</span>
+        {% endif %}
+
+        {{ field.errors }}
+    </div>
+    {% endfor %}
+
+    <button class="btn" type="submit">Simpan</button>
+</form>
+{% endblock %}
+```

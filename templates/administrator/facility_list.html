@@ -1,0 +1,49 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Data Fasilitas{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Data Fasilitas</h1>
+        <p class="muted">Kelola fasilitas yang tersedia pada kamar.</p>
+    </div>
+    <a class="btn" href="{% url 'administrator:facility_add' %}">＋ Tambah Fasilitas</a>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ikon</th>
+                    <th>Nama</th>
+                    <th>Keterangan</th>
+                    <th>Dipakai Kamar</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td style="font-size:1.4rem">{{ item.icon }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.description|default:'-' }}</td>
+                    <td>{{ item.room_count }}</td>
+                    <td>
+                        <div class="actions">
+                            <a class="btn btn-sm" href="{% url 'administrator:facility_edit' item.pk %}">Edit</a>
+                            <a class="btn btn-danger btn-sm" href="{% url 'administrator:facility_delete' item.pk %}">Hapus</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty">Belum ada fasilitas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

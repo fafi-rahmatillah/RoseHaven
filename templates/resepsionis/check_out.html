@@ -1,0 +1,56 @@
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Check Out{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Check Out Tamu</h1>
+        <p class="muted">Daftar tamu yang sedang menginap.</p>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Kode</th>
+                    <th>Customer</th>
+                    <th>Kamar</th>
+                    <th>Tanggal Check Out</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for r in reservations %}
+                <tr>
+                    <td>{{ r.code }}</td>
+                    <td>{{ r.customer.get_full_name|default:r.customer.username }}</td>
+                    <td>{{ r.room.number }} - {{ r.room.name }}</td>
+                    <td>{{ r.check_out|date:'d M Y' }}</td>
+                    <td>
+                        <span class="badge badge-{{ r.status|status_class }}">
+                            {{ r.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'resepsionis:check_out_action' r.pk %}">
+                            {% csrf_token %}
+                            <button class="btn btn-sm" type="submit">Proses Check Out</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty">Tidak ada tamu yang sedang check in.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

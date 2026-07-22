@@ -1,0 +1,103 @@
+{% extends 'base_public.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}RoseHaven Hotel - Beranda{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <div class="eyebrow">Hotel Bintang 4 • Elegan • Nyaman</div>
+            <h1>Temukan ketenangan di RoseHaven.</h1>
+            <p>{{ hotel.tagline|default:'A timeless stay, wrapped in comfort.' }} Nikmati kamar elegan, pelayanan hangat, dan reservasi yang mudah.</p>
+
+            <div class="hero-actions">
+                <a class="btn btn-gold" href="{% url 'public_rooms' %}">Lihat Kamar</a>
+                <a class="btn btn-light" href="{% url 'register' %}">Buat Reservasi</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="center">
+            <div class="eyebrow text-gold">Pilihan Terbaik</div>
+            <h2 style="font-family:Georgia,serif;font-size:2.4rem;color:var(--burgundy)">Kamar Unggulan</h2>
+            <p class="muted">Setiap kamar dirancang untuk kenyamanan dan pengalaman menginap berkelas.</p>
+        </div>
+
+        <div class="grid grid-3" style="margin-top:32px">
+            {% for room in rooms %}
+            <article class="card room-card">
+                <div class="room-image">
+                    {% if room.image %}
+                    <img src="{{ room.image.url }}" alt="{{ room.name }}">
+                    {% else %}
+                    <div class="room-placeholder">RoseHaven {{ room.number }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <small class="muted">{{ room.room_type.name }} • {{ room.room_type.capacity }} tamu</small>
+                    <h3>{{ room.name }}</h3>
+
+                    <div class="room-price">
+                        {{ room.price|rupiah }} <small class="muted">/ malam</small>
+                    </div>
+
+                    <div class="room-meta">
+                        <span>▣ {{ room.room_type.size_m2 }} m²</span>
+                        <span>⌑ {{ room.room_type.bed_type }}</span>
+                    </div>
+
+                    <a class="btn btn-outline btn-block" href="{% url 'public_room_detail' room.pk %}">Lihat Detail</a>
+                </div>
+            </article>
+            {% empty %}
+            <p>Belum ada kamar.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section" style="background:var(--cream)">
+    <div class="container split">
+        <div>
+            <div class="eyebrow text-gold">Tentang RoseHaven</div>
+            <h2 style="font-family:Georgia,serif;font-size:2.6rem;color:var(--burgundy)">Lebih dari sekadar tempat menginap.</h2>
+            <p>{{ hotel.description }}</p>
+            <p class="muted">Sistem reservasi kami memudahkan Anda memilih kamar, menentukan tanggal, mengunggah bukti pembayaran, dan memantau status reservasi secara langsung.</p>
+            <a class="btn" href="{% url 'about' %}">Kenali RoseHaven</a>
+        </div>
+
+        <div class="luxury-panel">
+            <h3>Pengalaman Bintang 4</h3>
+
+            <div class="feature">
+                <span class="feature-icon">✦</span>
+                <div>
+                    <strong>Pelayanan Hangat</strong>
+                    <div>Tim resepsionis siap membantu proses check in dan check out.</div>
+                </div>
+            </div>
+
+            <div class="feature">
+                <span class="feature-icon">⌂</span>
+                <div>
+                    <strong>Kamar Elegan</strong>
+                    <div>Pilihan tipe kamar dengan fasilitas lengkap dan harga transparan.</div>
+                </div>
+            </div>
+
+            <div class="feature">
+                <span class="feature-icon">✓</span>
+                <div>
+                    <strong>Reservasi Aman</strong>
+                    <div>Verifikasi pembayaran dan status reservasi yang jelas.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

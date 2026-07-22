@@ -1,0 +1,68 @@
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Pembayaran{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Pembayaran</h1>
+        <p class="muted">Reservasi {{ reservation.code }}</p>
+    </div>
+    <a class="btn btn-secondary" href="{% url 'customer:reservation_detail' reservation.pk %}">Kembali</a>
+</div>
+
+<div class="grid grid-2">
+    <div class="card">
+        <div class="card-body">
+            <h2 style="color:var(--burgundy)">Informasi Transfer</h2>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <small>Total pembayaran</small>
+                    <strong>{{ reservation.total|rupiah }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Status reservasi</small>
+                    <strong>{{ reservation.get_status_display }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Bank</small>
+                    <strong>{{ hotel.bank_name }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <small>Nomor rekening</small>
+                    <strong>{{ hotel.bank_account }}</strong>
+                </div>
+            </div>
+
+            <p>Atas nama: <strong>{{ hotel.bank_holder }}</strong></p>
+        </div>
+    </div>
+
+    <form class="form-card" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <h2 style="color:var(--burgundy)">Upload Bukti Transfer</h2>
+
+        {% if payment and payment.proof %}
+        <p>
+            <a target="_blank" href="{{ payment.proof.url }}">Lihat bukti sebelumnya</a>
+        </p>
+        {% endif %}
+
+        {% for field in form %}
+        <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+        </div>
+        {% endfor %}
+
+        <button class="btn" type="submit">Upload Bukti</button>
+    </form>
+</div>
+{% endblock %}
