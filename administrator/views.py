@@ -55,9 +55,31 @@ def dashboard(request):
 
 @ADMIN_ONLY
 def room_list(request):
-    rooms = Room.objects.select_related('room_type').prefetch_related('facilities')
-    return render(request, 'administrator/room_list.html', {'rooms': rooms})
+    rooms = (
+        Room.objects
+        .select_related("room_type")
+        .prefetch_related("facilities")
+    )
 
+    query = request.GET.get("q", "").strip()
+
+    if query:
+        rooms = rooms.filter(
+            Q(number__icontains=query)
+            | Q(name__icontains=query)
+            | Q(room_type__name__icontains=query)
+        )
+
+    context = {
+        "rooms": rooms,
+        "query": query,
+    }
+
+    return render(
+        request,
+        "administrator/room_list.html",
+        context,
+    )
 
 @ADMIN_ONLY
 def room_form(request, pk=None):

@@ -12,7 +12,29 @@
     </div>
     <a class="btn" href="{% url 'administrator:room_add' %}">＋ Tambah Kamar</a>
 </div>
+<form class="filter-bar" method="get">
+    <div class="form-group">
+        <label for="room-search">Cari Kamar</label>
 
+        <input
+            id="room-search"
+            type="search"
+            name="q"
+            value="{{ query }}"
+            placeholder="Nomor, nama, atau tipe kamar"
+        >
+    </div>
+
+    <button class="btn" type="submit">
+        Cari
+    </button>
+
+    {% if query %}
+    <a class="btn btn-secondary" href="{% url 'administrator:room_list' %}">
+        Reset
+    </a>
+    {% endif %}
+</form>
 <div class="table-card">
     <div class="table-wrap">
         <table>
@@ -55,10 +77,17 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr>
-                    <td colspan="7" class="empty">Belum ada kamar.</td>
-                </tr>
-                {% endfor %}
+<tr>
+    <td colspan="7" class="empty">
+        {% if query %}
+            Tidak ditemukan kamar yang cocok dengan pencarian
+            “{{ query }}”.
+        {% else %}
+            Belum ada kamar.
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
             </tbody>
         </table>
     </div>
