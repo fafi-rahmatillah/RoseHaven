@@ -8,7 +8,7 @@
     --text: #404040;
     --gold: #C9A15B;
     --white: #fff;
-    --muted: #7a7477;
+    --muted: #52464c;
     --success: #2f7d5c;
     --warning: #b77a16;
     --danger: #a52b3d;
@@ -204,31 +204,26 @@ textarea {
 .btn-block {
     width: 100%;
 }
+.hero{
+    min-height:610px;
+    display:grid;
+    align-items:center;
+    color:#fff;
+    position:relative;
+    overflow:hidden;
 
-.hero {
-    min-height: 610px;
-    display: grid;
-    align-items: center;
-    color: #fff;
     background:
         linear-gradient(
-            90deg,
-            rgba(53, 5, 22, .92),
-            rgba(123, 15, 46, .67)
+            rgba(70, 2, 27, 0.55),
+            rgba(78, 2, 2, 0.55)
         ),
-        radial-gradient(
-            circle at 82% 30%,
-            rgba(201, 161, 91, .7),
-            transparent 24%
-        ),
-        linear-gradient(
-            135deg,
-            #5b1026,
-            #b05a72
-        );
-    position: relative;
-    overflow: hidden;
+        url("../images/baner.jpg");
+
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
 }
+
 
 .hero:after {
     content: "";
@@ -249,7 +244,7 @@ textarea {
 .eyebrow {
     text-transform: uppercase;
     letter-spacing: 3px;
-    color: #efd7a9;
+    color: #efa824;
     font-weight: 700;
     font-size: .78rem;
 }
@@ -264,7 +259,7 @@ textarea {
 .hero p {
     font-size: 1.08rem;
     max-width: 620px;
-    color: #f4e9ed;
+    color: #faf8f9;
 }
 
 .hero-actions {
