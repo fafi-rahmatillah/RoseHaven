@@ -9,10 +9,13 @@
         <h1>Pembayaran</h1>
         <p class="muted">Reservasi {{ reservation.code }}</p>
     </div>
-    <a class="btn btn-secondary" href="{% url 'customer:reservation_detail' reservation.pk %}">Kembali</a>
+    <a class="btn btn-secondary" href="{% url 'customer:reservation_detail' reservation.pk %}">
+        Kembali
+    </a>
 </div>
 
 <div class="grid grid-2">
+
     <div class="card">
         <div class="card-body">
             <h2 style="color:var(--burgundy)">Informasi Transfer</h2>
@@ -34,35 +37,98 @@
                 </div>
 
                 <div class="detail-item">
-                    <small>Nomor rekening</small>
+                    <small>Nomor Rekening</small>
                     <strong>{{ hotel.bank_account }}</strong>
                 </div>
             </div>
 
-            <p>Atas nama: <strong>{{ hotel.bank_holder }}</strong></p>
+            <p>Atas Nama: <strong>{{ hotel.bank_holder }}</strong></p>
         </div>
     </div>
 
     <form class="form-card" method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <h2 style="color:var(--burgundy)">Upload Bukti Transfer</h2>
-
-        {% if payment and payment.proof %}
-        <p>
-            <a target="_blank" href="{{ payment.proof.url }}">Lihat bukti sebelumnya</a>
-        </p>
-        {% endif %}
-
-        {% for field in form %}
         <div class="form-group">
-            <label>{{ field.label }}</label>
-            {{ field }}
-            {{ field.errors }}
+            <label>Metode Pembayaran</label>
+            <select name="payment_method" id="payment_method">
+                <option value="transfer">Transfer Bank</option>
+                <option value="qris">QRIS</option>
+                <option value="dana">DANA</option>
+                <option value="ovo">OVO</option>
+                <option value="gopay">GoPay</option>
+                <option value="cash">Cash / Bayar Ditempat</option>
+            </select>
         </div>
-        {% endfor %}
 
-        <button class="btn" type="submit">Upload Bukti</button>
+        <!-- Bagian Transfer -->
+        <div id="upload-transfer">
+
+            <h2 style="color:var(--burgundy)">Upload Bukti Transfer</h2>
+
+            {% if payment and payment.proof %}
+            <p>
+                <a target="_blank" href="{{ payment.proof.url }}">
+                    Lihat bukti sebelumnya
+                </a>
+            </p>
+            {% endif %}
+
+            {% for field in form %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {{ field.errors }}
+            </div>
+            {% endfor %}
+
+            <button class="btn" type="submit">
+                Upload Bukti
+            </button>
+
+        </div>
+
+        <!-- Bagian Cash -->
+        <div id="cash-section" style="display:none;">
+
+            <h2 style="color:var(--burgundy)">Pembayaran Cash</h2>
+
+            <p>
+                Anda memilih pembayaran Cash / Bayar di Tempat.
+            </p>
+
+            <button class="btn" type="submit">
+                Oke
+            </button>
+
+        </div>
+
     </form>
+
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const paymentMethod = document.getElementById("payment_method");
+    const uploadTransfer = document.getElementById("upload-transfer");
+    const cashSection = document.getElementById("cash-section");
+
+    function togglePayment() {
+        if (paymentMethod.value === "cash") {
+            uploadTransfer.style.display = "none";
+            cashSection.style.display = "block";
+        } else {
+            uploadTransfer.style.display = "block";
+            cashSection.style.display = "none";
+        }
+    }
+
+    paymentMethod.addEventListener("change", togglePayment);
+
+    togglePayment();
+
+});
+</script>
+
 {% endblock %}

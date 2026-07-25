@@ -34,9 +34,43 @@
     </div>
 </div>
 
+<!-- Card Akses Cepat -->
 <div class="table-card">
     <div class="table-head">
-        <h3>Reservasi Terbaru</h3>
+        <h3>Akses Cepat Resepsionis</h3>
+    </div>
+
+    <div style="padding: 20px;">
+        <p class="muted">
+            Gunakan menu berikut untuk membantu pelayanan tamu dengan lebih cepat.
+        </p>
+
+        <p>
+            <a class="btn" href="{% url 'resepsionis:walk_in_add' %}">
+                ＋ Buat Reservasi Langsung
+            </a>
+        </p>
+
+        <p>
+            <a class="btn" href="{% url 'resepsionis:reservation_list' %}">
+                Lihat Daftar Reservasi
+            </a>
+        </p>
+
+        <p class="muted">
+            Pastikan data pelanggan, kamar, tanggal menginap, dan status pembayaran telah diperiksa
+            sebelum melakukan proses check in.
+        </p>
+    </div>
+</div>
+
+<!-- Card Reservasi Terbaru -->
+<div class="table-card"style="margin-top: 30px;">
+    <div class="table-head">
+        <div>
+            <h3>Reservasi Terbaru</h3>
+            <p class="muted">Daftar reservasi pelanggan yang baru masuk ke sistem.</p>
+        </div>
         <a href="{% url 'resepsionis:reservation_list' %}">Lihat semua</a>
     </div>
 
@@ -77,3 +111,4 @@
     </div>
 </div>
 {% endblock %}
+ubah code supaya tabel tidak nyatu dengan tabel dibawahnya.tanpa melibatkan css,langsung mengubah code di dashboard.html
