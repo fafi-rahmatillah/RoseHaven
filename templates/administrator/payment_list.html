@@ -43,7 +43,10 @@
                             {{ p.get_status_display }}
                         </span>
                     </td>
-                    <td>{{ p.verified_by.get_full_name|default:p.verified_by.username|default:'-' }}</td>
+                    <td>{% if p.verified_by %} {{ p.verified_by.get_full_name|default:p.verified_by.username }}
+                        {% else %}
+    -
+                        {% endif %}</td>
                     <td>
                         <div class="actions">
                             <a class="btn btn-sm" href="{% url 'administrator:payment_edit' p.pk %}">Edit</a>
