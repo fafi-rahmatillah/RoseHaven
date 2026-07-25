@@ -109,14 +109,10 @@ textarea {
 }
 
 .brand-mark {
-    width: 38px;
-    height: 38px;
-    border: 1px solid var(--gold);
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
     border-radius: 50%;
-    display: grid;
-    place-items: center;
-    color: var(--gold);
-    font-size: 19px;
 }
 
 .nav-links {
