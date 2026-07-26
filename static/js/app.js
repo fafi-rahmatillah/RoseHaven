@@ -7,3 +7,5 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(sideBtn&&side) sideBtn.addEventListener('click',()=>side.classList.toggle('open'));
   setTimeout(()=>document.querySelectorAll('.alert').forEach(el=>el.style.display='none'),5000);
 });
+
+
