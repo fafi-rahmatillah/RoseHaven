@@ -186,12 +186,15 @@ class Room(models.Model):
         if not check_in or not check_out:
             return self.status == self.Status.AVAILABLE
 
-        reservations = self.reservations.exclude(
+        reservations = Reservation.objects.filter(
+            Q(room=self) | Q(reserved_rooms__room=self)
+        ).exclude(
             status__in=[
                 Reservation.Status.CANCELED,
                 Reservation.Status.COMPLETED,
+                Reservation.Status.CHECKED_OUT,
             ]
-        )
+        ).distinct()
 
         if exclude_reservation:
             reservations = reservations.exclude(
@@ -414,6 +417,39 @@ class Reservation(models.Model):
 
     def __str__(self):
         return self.code
+
+
+class ReservationRoom(models.Model):
+    reservation = models.ForeignKey(
+        Reservation,
+        on_delete=models.CASCADE,
+        related_name='reserved_rooms',
+        verbose_name='Reservasi',
+    )
+    room = models.ForeignKey(
+        Room,
+        on_delete=models.PROTECT,
+        related_name='reservation_items',
+        verbose_name='Kamar',
+    )
+    price_per_night = models.DecimalField(
+        'Harga per malam',
+        max_digits=12,
+        decimal_places=2,
+    )
+
+    class Meta:
+        verbose_name = 'Kamar reservasi'
+        verbose_name_plural = 'Kamar reservasi'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['reservation', 'room'],
+                name='unique_room_in_reservation',
+            ),
+        ]
+
+    def __str__(self):
+        return f'{self.reservation} - {self.room}'
 
 
 class Payment(models.Model):
