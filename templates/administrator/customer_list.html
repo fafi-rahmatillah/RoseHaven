@@ -1,4 +1,5 @@
 {% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
 
 {% block title %}Data Customer{% endblock %}
 
@@ -6,9 +7,18 @@
 <div class="page-title">
     <div>
         <h1>Data Customer</h1>
-        <p class="muted">Kelola akun pelanggan RoseHaven.</p>
+        <p class="muted">
+            Kelola akun pelanggan dan lihat status
+            validasi identitas.
+        </p>
     </div>
-    <a class="btn" href="{% url 'administrator:customer_add' %}">＋ Tambah Customer</a>
+
+    <a
+        class="btn"
+        href="{% url 'administrator:customer_add' %}"
+    >
+        ＋ Tambah Customer
+    </a>
 </div>
 
 <div class="table-card">
@@ -18,38 +28,73 @@
                 <tr>
                     <th>Nama</th>
                     <th>Username</th>
-                    <th>Email</th>
+                    <th>NIK</th>
                     <th>No. HP</th>
-                    <th>Alamat</th>
-                    <th>Status</th>
+                    <th>Validasi</th>
+                    <th>Akun</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for u in users %}
                 <tr>
-                    <td>{{ u.get_full_name|default:'-' }}</td>
+                    <td>
+                        {{ u.get_full_name|default:'-' }}
+                    </td>
+
                     <td>{{ u.username }}</td>
-                    <td>{{ u.email }}</td>
-                    <td>{{ u.customer_profile.phone|default:'-' }}</td>
-                    <td>{{ u.customer_profile.address|truncatechars:45|default:'-' }}</td>
+
+                    <td>
+                        {{ u.customer_profile.masked_nik }}
+                    </td>
+
+                    <td>
+                        {{ u.customer_profile.phone|default:'-' }}
+                    </td>
+
+                    <td>
+                        <span class="badge badge-{{ u.customer_profile.identity_status|status_class }}">
+                            {{ u.customer_profile.get_identity_status_display }}
+                        </span>
+                    </td>
+
                     <td>
                         {% if u.is_active %}
-                        <span class="badge badge-success">Aktif</span>
+                        <span class="badge badge-success">
+                            Aktif
+                        </span>
                         {% else %}
-                        <span class="badge badge-danger">Nonaktif</span>
+                        <span class="badge badge-danger">
+                            Nonaktif
+                        </span>
                         {% endif %}
                     </td>
+
                     <td>
                         <div class="actions">
-                            <a class="btn btn-sm" href="{% url 'administrator:customer_edit' u.pk %}">Edit</a>
-                            <a class="btn btn-danger btn-sm" href="{% url 'administrator:customer_delete' u.pk %}">Hapus</a>
+                            <a
+                                class="btn btn-sm"
+                                href="{% url 'administrator:customer_edit' u.pk %}"
+                            >
+                                Edit
+                            </a>
+
+                            <a
+                                class="btn btn-danger btn-sm"
+                                href="{% url 'administrator:customer_delete' u.pk %}"
+                            >
+                                Hapus
+                            </a>
                         </div>
                     </td>
                 </tr>
+
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="empty">Belum ada customer.</td>
+                    <td colspan="7" class="empty">
+                        Belum ada customer.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -57,4 +102,3 @@
     </div>
 </div>
 {% endblock %}
-```

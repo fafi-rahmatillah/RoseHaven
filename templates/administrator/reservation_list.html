@@ -7,22 +7,45 @@
 <div class="page-title">
     <div>
         <h1>Data Reservasi</h1>
-        <p class="muted">Kelola seluruh reservasi dan status operasional.</p>
+        <p class="muted">
+            Kelola seluruh reservasi, termasuk
+            reservasi beberapa kamar.
+        </p>
     </div>
-    <a class="btn" href="{% url 'administrator:reservation_add' %}">＋ Tambah Reservasi</a>
+
+    <a
+        class="btn"
+        href="{% url 'administrator:reservation_add' %}"
+    >
+        ＋ Tambah Reservasi
+    </a>
 </div>
 
 <form class="filter-bar" method="get">
     <div class="form-group">
         <label>Status</label>
+
         <select name="status">
-            <option value="">Semua Status</option>
-            {% for value,label in statuses %}
-            <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+            <option value="">
+                Semua Status
+            </option>
+
+            {% for value, label in statuses %}
+            <option
+                value="{{ value }}"
+                {% if selected_status == value %}
+                selected
+                {% endif %}
+            >
+                {{ label }}
+            </option>
             {% endfor %}
         </select>
     </div>
-    <button class="btn" type="submit">Filter</button>
+
+    <button class="btn" type="submit">
+        Filter
+    </button>
 </form>
 
 <div class="table-card">
@@ -45,26 +68,60 @@
                 {% for r in reservations %}
                 <tr>
                     <td>{{ r.code }}</td>
-                    <td>{{ r.customer.get_full_name|default:r.customer.username }}</td>
-                    <td>{{ r.room.number }}</td>
-                    <td>{{ r.check_in|date:'d-m-Y' }}</td>
-                    <td>{{ r.check_out|date:'d-m-Y' }}</td>
+
+                    <td>
+                        {{ r.customer.get_full_name|default:r.customer.username }}
+                    </td>
+
+                    <td>
+                        {% for item in r.reservation_rooms.all %}
+                            {{ item.room }}
+                            {% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            -
+                        {% endfor %}
+                    </td>
+
+                    <td>
+                        {{ r.check_in|date:'d-m-Y' }}
+                    </td>
+
+                    <td>
+                        {{ r.check_out|date:'d-m-Y' }}
+                    </td>
+
                     <td>
                         <span class="badge badge-{{ r.status|status_class }}">
                             {{ r.get_status_display }}
                         </span>
                     </td>
+
                     <td>{{ r.total|rupiah }}</td>
+
                     <td>
                         <div class="actions">
-                            <a class="btn btn-sm" href="{% url 'administrator:reservation_edit' r.pk %}">Edit</a>
-                            <a class="btn btn-danger btn-sm" href="{% url 'administrator:reservation_delete' r.pk %}">Hapus</a>
+                            <a
+                                class="btn btn-sm"
+                                href="{% url 'administrator:reservation_edit' r.pk %}"
+                            >
+                                Edit
+                            </a>
+
+                            <a
+                                class="btn btn-danger btn-sm"
+                                href="{% url 'administrator:reservation_delete' r.pk %}"
+                            >
+                                Hapus
+                            </a>
                         </div>
                     </td>
                 </tr>
+
                 {% empty %}
                 <tr>
-                    <td colspan="8" class="empty">Belum ada reservasi.</td>
+                    <td colspan="8" class="empty">
+                        Belum ada reservasi.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
