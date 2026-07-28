@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from customer.models import CustomerProfile
 from .forms import IdentityVerificationForm
+from django.contrib.auth.decorators import login_required
 
 STAFF_ONLY = role_required('Resepsionis')
 
