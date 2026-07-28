@@ -3,6 +3,8 @@
 {% block title %}Data Customer{% endblock %}
 
 {% block content %}
+
+<!-- Judul Halaman -->
 <div class="page-title">
     <div>
         <h1>Data Customer</h1>
@@ -10,9 +12,10 @@
     </div>
 </div>
 
+<!-- Tabel Data Customer -->
 <div class="table-card">
     <div class="table-wrap">
-        <table>
+        <table id="customerTable">
             <thead>
                 <tr>
                     <th>Nama</th>
@@ -22,23 +25,127 @@
                     <th>Alamat</th>
                 </tr>
             </thead>
-
-            <tbody>
+            <tbody id="customerTableBody">
                 {% for u in users %}
-                <tr>
-                    <td>{{ u.get_full_name|default:'-' }}</td>
-                    <td>{{ u.username }}</td>
-                    <td>{{ u.email }}</td>
-                    <td>{{ u.customer_profile.phone|default:'-' }}</td>
-                    <td>{{ u.customer_profile.address|default:'-' }}</td>
+                <tr class="customer-row">
+                    <td>
+                        {{ u.get_full_name|default:'-' }}
+                    </td>
+                    <td>
+                        {{ u.username }}
+                    </td>
+                    <td>
+                        {{ u.email }}
+                    </td>
+                    <td>
+                        {{ u.customer_profile.phone|default:'-' }}
+                    </td>
+                    <td>
+                        {{ u.customer_profile.address|default:'-' }}
+                    </td>
                 </tr>
+
                 {% empty %}
+
                 <tr>
-                    <td colspan="5" class="empty">Belum ada customer.</td>
+                    <td colspan="5" class="empty">
+                        Belum ada customer.
+                    </td>
                 </tr>
+
                 {% endfor %}
+
             </tbody>
+
         </table>
     </div>
 </div>
+
+
+<!-- JavaScript Pencarian -->
+<script>
+    function searchCustomer() {
+
+        // Ambil kata yang diketik di kotak pencarian
+        const input = document.getElementById("searchCustomer");
+
+        // Ubah menjadi huruf kecil agar pencarian tidak sensitif huruf besar/kecil
+        const searchText = input.value.toLowerCase().trim();
+
+        // Ambil semua baris customer
+        const rows = document.querySelectorAll(".customer-row");
+
+        // Elemen untuk menampilkan jumlah hasil
+        const resultText = document.getElementById("searchResult");
+
+        let found = 0;
+
+        // Periksa setiap baris customer
+        rows.forEach(function(row) {
+
+            // Ambil semua teks yang ada di dalam baris
+            const rowText = row.textContent.toLowerCase();
+
+            // Jika teks pencarian ditemukan
+            if (rowText.includes(searchText)) {
+
+                row.style.display = "";
+                found++;
+
+            } else {
+
+                row.style.display = "none";
+
+            }
+
+        });
+
+        // Jika kolom pencarian kosong
+        if (searchText === "") {
+
+            resultText.textContent = "";
+
+        } else {
+
+            resultText.textContent =
+                "Menampilkan " + found + " customer dari hasil pencarian.";
+
+        }
+
+    }
+
+
+    // Fungsi Reset Pencarian
+    function resetSearch() {
+
+        // Kosongkan input pencarian
+        document.getElementById("searchCustomer").value = "";
+
+        // Ambil semua baris customer
+        const rows = document.querySelectorAll(".customer-row");
+
+        // Tampilkan kembali semua data
+        rows.forEach(function(row) {
+
+            row.style.display = "";
+
+        });
+
+        // Hapus keterangan hasil pencarian
+        document.getElementById("searchResult").textContent = "";
+
+    }
+
+
+    // Pencarian otomatis ketika mengetik
+    document.getElementById("searchCustomer").addEventListener(
+        "keyup",
+        function() {
+
+            searchCustomer();
+
+        }
+    );
+</script>
+
 {% endblock %}

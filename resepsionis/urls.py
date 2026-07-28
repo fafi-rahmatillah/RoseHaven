@@ -16,4 +16,6 @@ urlpatterns = [
     path('check-out/', views.check_out_list, name='check_out_list'),
     path('check-out/<int:pk>/', views.check_out_action, name='check_out_action'),
     path('jadwal/', views.schedule, name='schedule'),
+    path('validasi-identitas/',views.identity_list,name='identity_list',),
+    path('validasi-identitas/<int:profile_id>/',views.identity_verify,name='identity_verify'),
 ]
