@@ -12,83 +12,10 @@
     </div>
 </div>
 
-
-<!-- Kotak Pencarian -->
-<div class="table-card" style="margin-bottom: 20px;">
-    <div style="padding: 20px;">
-
-        <div style="
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        ">
-
-            <!-- Input Pencarian -->
-            <input
-                type="text"
-                id="searchCustomer"
-                placeholder="Cari nama, username, email, no. HP, atau alamat..."
-                style="
-                    flex: 1;
-                    min-width: 250px;
-                    padding: 12px 15px;
-                    border: 1px solid #ddd;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    outline: none;
-                "
-            >
-
-            <!-- Tombol Cari -->
-            <button
-                type="button"
-                onclick="searchCustomer()"
-                class="btn"
-                style="
-                    padding: 12px 20px;
-                    border: none;
-                    cursor: pointer;
-                "
-            >
-                    Cari
-            </button>
-
-            <!-- Tombol Reset -->
-            <button
-                type="button"
-                onclick="resetSearch()"
-                style="
-                    padding: 12px 20px;
-                    border: none;
-                    border-radius: 8px;
-                    background: #ddd;
-                    color: #333;
-                    cursor: pointer;
-                    font-weight: 600;
-                "
-            >
-                Reset
-            </button>
-
-        </div>
-
-        <!-- Keterangan Hasil Pencarian -->
-        <p
-            id="searchResult"
-            class="muted"
-            style="margin: 12px 0 0 0;"
-        ></p>
-
-    </div>
-</div>
-
-
 <!-- Tabel Data Customer -->
 <div class="table-card">
     <div class="table-wrap">
         <table id="customerTable">
-
             <thead>
                 <tr>
                     <th>Nama</th>
@@ -98,33 +25,24 @@
                     <th>Alamat</th>
                 </tr>
             </thead>
-
             <tbody id="customerTableBody">
-
                 {% for u in users %}
-
                 <tr class="customer-row">
-
                     <td>
                         {{ u.get_full_name|default:'-' }}
                     </td>
-
                     <td>
                         {{ u.username }}
                     </td>
-
                     <td>
                         {{ u.email }}
                     </td>
-
                     <td>
                         {{ u.customer_profile.phone|default:'-' }}
                     </td>
-
                     <td>
                         {{ u.customer_profile.address|default:'-' }}
                     </td>
-
                 </tr>
 
                 {% empty %}
