@@ -20,16 +20,28 @@
             <h2 style="color:var(--burgundy)">Informasi Menginap</h2>
 
             <div class="detail-grid">
+                <h3>Kamar yang Dipesan</h3>
+                {% for item in reservation.reserved_rooms.all %}
                 <div class="detail-item">
                     <small>Kamar</small>
-                    <strong>{{ reservation.room.name }} ({{ reservation.room.number }})</strong>
+                    <strong>{{ item.room.number }} - {{ item.room.name }}</strong>
                 </div>
-
+                
                 <div class="detail-item">
                     <small>Tipe Kamar</small>
-                    <strong>{{ reservation.room.room_type.name }}</strong>
+                    <strong>{{ item.room.room_type.name }}</strong>
                 </div>
-
+                
+                <div class="detail-item">
+                    <small>Harga per Malam</small>
+                    <strong>{{ item.price_per_night|rupiah }}</strong>
+                </div>
+                
+                <hr>
+                {% empty %}
+                <p>Tidak ada data kamar.</p>
+                {% endfor %}
+                
                 <div class="detail-item">
                     <small>Check In</small>
                     <strong>{{ reservation.check_in|date:'d M Y' }}</strong>

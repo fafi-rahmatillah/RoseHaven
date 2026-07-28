@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="auth-wrap">
-    <form class="auth-card" style="width:min(620px,100%)" method="post">
+    <form class="auth-card" style="width:min(620px,100%)" method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
         <div class="eyebrow text-gold">Akun Customer</div>

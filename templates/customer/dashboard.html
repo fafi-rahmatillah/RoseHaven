@@ -18,6 +18,23 @@
             ＋ Reservasi Baru
         </a>
     </div>
+    
+    {% if request.user.customer_profile.identity_status == 'pending' %}
+    <div class="alert alert-warning">
+        Identitas Anda sedang menunggu validasi resepsionis.
+    </div>
+    
+    {% elif request.user.customer_profile.identity_status == 'verified' %}
+    <div class="alert alert-success">
+        Identitas Anda sudah terverifikasi.
+    </div>
+
+    {% elif request.user.customer_profile.identity_status == 'rejected' %}
+    <div class="alert alert-danger">
+        Validasi identitas ditolak. Silakan hubungi petugas hotel.
+    </div>
+    
+    {% endif %}
 
     <div class="stats">
         <div class="stat-card">

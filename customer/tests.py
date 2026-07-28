@@ -21,15 +21,14 @@ class CustomerFlowTests(TestCase):
         group, _ = Group.objects.get_or_create(name='Customer')
         self.user = User.objects.create_user('cust', 'cust@example.com', 'StrongPass123!')
         self.user.groups.add(group)
-        CustomerProfile.objects.create(user=self.user, phone='0812', address='Alamat')
+        CustomerProfile.objects.create(user=self.user,nik='3578123412341233',phone='0812',address='Alamat')
         self.room_type = RoomType.objects.create(name='Deluxe', base_price=500000, capacity=2)
         self.room = Room.objects.create(number='101', name='Deluxe 101', room_type=self.room_type)
 
     def test_registration_creates_customer_group_and_profile(self):
-        response = self.client.post(reverse('register'), {
-            'name': 'Budi Santoso', 'email': 'budi@example.com', 'phone': '08123',
-            'address': 'Bandung', 'password': 'AnotherPass123!', 'password_confirm': 'AnotherPass123!',
-        })
+        response = self.client.post(reverse('register'), {'name': 'Budi Santoso','email': 'budi@example.com','phone': '08123','address': 'Bandung','nik': '3578123412341234',
+                                                          'is_married': False,'password': 'AnotherPass123!','password_confirm': 'AnotherPass123!',
+                                                          })
         self.assertRedirects(response, reverse('login'))
         user = User.objects.get(email='budi@example.com')
         self.assertTrue(user.groups.filter(name='Customer').exists())
@@ -40,7 +39,7 @@ class CustomerFlowTests(TestCase):
         check_in = timezone.localdate() + timedelta(days=3)
         check_out = check_in + timedelta(days=2)
         response = self.client.post(reverse('customer:reserve_room', args=[self.room.pk]), {
-            'room': self.room.pk, 'check_in': check_in, 'check_out': check_out, 'guests': 2, 'notes': 'Test',
+            'rooms': [self.room.pk], 'check_in': check_in, 'check_out': check_out, 'guests': 2, 'notes': 'Test',
         })
         reservation = Reservation.objects.get(customer=self.user)
         self.assertEqual(reservation.total, 1000000)
@@ -57,9 +56,9 @@ class CustomerFlowTests(TestCase):
         check_out = check_in + timedelta(days=3)
         Reservation.objects.create(customer=self.user, room=self.room, check_in=check_in, check_out=check_out, guests=1)
         response = self.client.post(reverse('customer:reserve_room', args=[self.room.pk]), {
-            'room': self.room.pk, 'check_in': check_in + timedelta(days=1),
+            'rooms': [self.room.pk], 'check_in': check_in + timedelta(days=1),
             'check_out': check_out + timedelta(days=1), 'guests': 1, 'notes': '',
         })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Reservation.objects.count(), 1)
-        self.assertContains(response, 'Kamar tidak tersedia')
+        self.assertContains(response,'Kamar berikut tidak tersedia')
