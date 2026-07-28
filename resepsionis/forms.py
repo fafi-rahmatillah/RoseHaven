@@ -51,3 +51,26 @@ class PaymentVerificationForm(forms.ModelForm):
         model = Payment
         fields = ['status', 'notes']
         widgets = {'notes': forms.Textarea(attrs={'rows': 3})}
+
+class IdentityVerificationForm(forms.Form):
+    identity_method = forms.ChoiceField(
+        label='Metode pemeriksaan',
+
+        choices=[
+            ('online', 'Pemeriksaan dokumen online'),
+            ('face_to_face', 'Pemeriksaan KTP tatap muka'),
+        ],
+    )
+    identity_notes = forms.CharField(
+        label='Catatan pemeriksaan',
+        required=False,
+        widget=forms.Textarea(attrs={'rows': 3}),
+    )
+    decision = forms.ChoiceField(
+        label='Keputusan',
+        choices=[
+            ('verified', 'Setujui'),
+            ('rejected', 'Tolak'),
+        ],
+        widget=forms.RadioSelect,
+    )
