@@ -68,6 +68,7 @@ class RoomType(models.Model):
         verbose_name = 'Tipe kamar'
         verbose_name_plural = 'Tipe kamar'
         ordering = ['base_price']
+
         constraints = [
             models.CheckConstraint(
                 condition=Q(base_price__gte=0),
@@ -148,12 +149,14 @@ class Room(models.Model):
         verbose_name = 'Kamar'
         verbose_name_plural = 'Kamar'
         ordering = ['number']
+
         indexes = [
             models.Index(
                 fields=['status', 'is_active'],
                 name='room_status_active_idx',
             ),
         ]
+
         constraints = [
             models.CheckConstraint(
                 condition=(
@@ -186,15 +189,21 @@ class Room(models.Model):
         if not check_in or not check_out:
             return self.status == self.Status.AVAILABLE
 
-        reservations = Reservation.objects.filter(
-            Q(room=self) | Q(reserved_rooms__room=self)
-        ).exclude(
-            status__in=[
-                Reservation.Status.CANCELED,
-                Reservation.Status.COMPLETED,
-                Reservation.Status.CHECKED_OUT,
-            ]
-        ).distinct()
+        reservations = (
+            Reservation.objects
+            .filter(
+                Q(room=self)
+                | Q(reserved_rooms__room=self)
+            )
+            .exclude(
+                status__in=[
+                    Reservation.Status.CANCELED,
+                    Reservation.Status.COMPLETED,
+                    Reservation.Status.CHECKED_OUT,
+                ]
+            )
+            .distinct()
+        )
 
         if exclude_reservation:
             reservations = reservations.exclude(
@@ -263,7 +272,7 @@ class Reservation(models.Model):
         Room,
         on_delete=models.PROTECT,
         related_name='reservations',
-        verbose_name='Kamar',
+        verbose_name='Kamar utama',
     )
     check_in = models.DateField(
         'Tanggal check in',
@@ -323,6 +332,7 @@ class Reservation(models.Model):
         verbose_name = 'Reservasi'
         verbose_name_plural = 'Reservasi'
         ordering = ['-created_at']
+
         indexes = [
             models.Index(
                 fields=['status', 'check_in'],
@@ -337,6 +347,7 @@ class Reservation(models.Model):
                 name='res_customer_created_idx',
             ),
         ]
+
         constraints = [
             models.CheckConstraint(
                 condition=Q(
@@ -357,8 +368,35 @@ class Reservation(models.Model):
     @property
     def nights(self):
         if self.check_in and self.check_out:
-            duration = (self.check_out - self.check_in).days
-            return max(duration, 0)
+            return max(
+                (self.check_out - self.check_in).days,
+                0,
+            )
+
+        return 0
+
+    @property
+    def room_count(self):
+        if self.pk:
+            count = self.reserved_rooms.count()
+
+            if count:
+                return count
+
+        return 1 if self.room_id else 0
+
+    @property
+    def total_capacity(self):
+        if self.pk and self.reserved_rooms.exists():
+            return sum(
+                item.room.room_type.capacity
+                for item in self.reserved_rooms.select_related(
+                    'room__room_type'
+                )
+            )
+
+        if self.room_id:
+            return self.room.room_type.capacity
 
         return 0
 
@@ -371,17 +409,18 @@ class Reservation(models.Model):
             and self.check_out <= self.check_in
         ):
             errors['check_out'] = (
-                'Tanggal check out harus setelah tanggal check in.'
+                'Tanggal check out harus setelah '
+                'tanggal check in.'
             )
 
         if (
-            self.room_id
-            and self.guests
-            and self.guests > self.room.room_type.capacity
+            self.guests
+            and self.total_capacity
+            and self.guests > self.total_capacity
         ):
             errors['guests'] = (
-                f'Maksimal {self.room.room_type.capacity} '
-                'tamu untuk kamar ini.'
+                f'Maksimal {self.total_capacity} tamu '
+                'untuk kamar yang dipilih.'
             )
 
         if (
@@ -398,7 +437,8 @@ class Reservation(models.Model):
 
             if not room_available:
                 errors['room'] = (
-                    'Kamar tidak tersedia pada rentang tanggal tersebut.'
+                    'Kamar tidak tersedia pada '
+                    'rentang tanggal tersebut.'
                 )
 
         if errors:
@@ -408,39 +448,147 @@ class Reservation(models.Model):
         if not self.code:
             random_code = secrets.token_hex(3).upper()
             date_code = timezone.now().strftime('%Y%m%d')
-            self.code = f'RH-{date_code}-{random_code}'
 
-        if self.room_id and self.check_in and self.check_out:
-            self.total = Decimal(self.nights) * self.room.price
+            self.code = (
+                f'RH-{date_code}-{random_code}'
+            )
+
+        if (
+            self.room_id
+            and self.check_in
+            and self.check_out
+        ):
+            has_multiple_room_data = (
+                self.pk
+                and self.reserved_rooms.exists()
+            )
+
+            if not has_multiple_room_data:
+                self.total = (
+                    Decimal(self.nights)
+                    * self.room.price
+                )
 
         super().save(*args, **kwargs)
+
+    def recalculate_total(self, save=True):
+        if self.pk and self.reserved_rooms.exists():
+            nightly_total = sum(
+                (
+                    item.price_per_night
+                    for item
+                    in self.reserved_rooms.all()
+                ),
+                Decimal('0'),
+            )
+
+        elif self.room_id:
+            nightly_total = self.room.price
+
+        else:
+            nightly_total = Decimal('0')
+
+        self.total = (
+            Decimal(self.nights)
+            * nightly_total
+        )
+
+        if save:
+            self.save(
+                update_fields=[
+                    'total',
+                    'updated_at',
+                ]
+            )
+
+        return self.total
+
+    def ensure_stay_record(self):
+        record, _ = StayRecord.objects.get_or_create(
+            reservation=self
+        )
+
+        return record
 
     def __str__(self):
         return self.code
 
 
 class ReservationRoom(models.Model):
+    class KeyStatus(models.TextChoices):
+        NOT_GIVEN = 'NOT_GIVEN', 'Belum diberikan'
+        GIVEN = 'GIVEN', 'Sudah diberikan'
+        RETURNED = 'RETURNED', 'Sudah dikembalikan'
+        PROBLEM = 'PROBLEM', 'Hilang atau bermasalah'
+
     reservation = models.ForeignKey(
         Reservation,
         on_delete=models.CASCADE,
         related_name='reserved_rooms',
         verbose_name='Reservasi',
     )
+
     room = models.ForeignKey(
         Room,
         on_delete=models.PROTECT,
         related_name='reservation_items',
         verbose_name='Kamar',
     )
+
     price_per_night = models.DecimalField(
         'Harga per malam',
         max_digits=12,
         decimal_places=2,
     )
 
+    key_status = models.CharField(
+        'Status kunci',
+        max_length=20,
+        choices=KeyStatus.choices,
+        default=KeyStatus.NOT_GIVEN,
+    )
+
+    key_given_at = models.DateTimeField(
+        'Waktu kunci diberikan',
+        null=True,
+        blank=True,
+    )
+
+    key_given_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='keys_given',
+        verbose_name='Kunci diberikan oleh',
+    )
+
+    key_returned_at = models.DateTimeField(
+        'Waktu kunci dikembalikan',
+        null=True,
+        blank=True,
+    )
+
+    key_returned_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='keys_received',
+        verbose_name='Kunci diterima oleh',
+    )
+
+    key_notes = models.CharField(
+        'Catatan/kondisi kunci',
+        max_length=255,
+        blank=True,
+    )
+
     class Meta:
         verbose_name = 'Kamar reservasi'
         verbose_name_plural = 'Kamar reservasi'
+        ordering = ['room__number']
+
         constraints = [
             models.UniqueConstraint(
                 fields=['reservation', 'room'],
@@ -448,9 +596,126 @@ class ReservationRoom(models.Model):
             ),
         ]
 
+        indexes = [
+            models.Index(
+                fields=['key_status'],
+                name='reservation_key_status_idx',
+            ),
+        ]
+
     def __str__(self):
         return f'{self.reservation} - {self.room}'
 
+
+class StayRecord(models.Model):
+    class KtpStatus(models.TextChoices):
+        NOT_RECEIVED = (
+            'NOT_RECEIVED',
+            'Belum diserahkan',
+        )
+
+        HELD = (
+            'HELD',
+            'Dititipkan sebagai jaminan',
+        )
+
+        RETURNED = (
+            'RETURNED',
+            'Sudah dikembalikan',
+        )
+
+    reservation = models.OneToOneField(
+        Reservation,
+        on_delete=models.CASCADE,
+        related_name='stay_record',
+        verbose_name='Reservasi',
+    )
+
+    ktp_status = models.CharField(
+        'Status jaminan KTP',
+        max_length=20,
+        choices=KtpStatus.choices,
+        default=KtpStatus.NOT_RECEIVED,
+    )
+
+    ktp_received_at = models.DateTimeField(
+        'Waktu KTP diterima',
+        null=True,
+        blank=True,
+    )
+
+    ktp_received_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='ktp_guarantees_received',
+        verbose_name='KTP diterima oleh',
+    )
+
+    ktp_returned_at = models.DateTimeField(
+        'Waktu KTP dikembalikan',
+        null=True,
+        blank=True,
+    )
+
+    ktp_returned_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='ktp_guarantees_returned',
+        verbose_name='KTP dikembalikan oleh',
+    )
+
+    notes = models.TextField(
+        'Catatan jaminan KTP',
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = 'Catatan menginap dan jaminan'
+        verbose_name_plural = 'Catatan menginap dan jaminan'
+
+        indexes = [
+            models.Index(
+                fields=['ktp_status'],
+                name='stay_ktp_status_idx',
+            ),
+        ]
+
+    @property
+    def identity_verified(self):
+        profile = getattr(
+            self.reservation.customer,
+            'customer_profile',
+            None,
+        )
+
+        return bool(
+            profile and profile.identity_is_verified
+        )
+
+    @property
+    def all_keys_given(self):
+        items = self.reservation.reserved_rooms.all()
+
+        return bool(items) and all(
+            item.key_status == ReservationRoom.KeyStatus.GIVEN
+            for item in items
+        )
+
+    @property
+    def all_keys_returned(self):
+        items = self.reservation.reserved_rooms.all()
+
+        return bool(items) and all(
+            item.key_status == ReservationRoom.KeyStatus.RETURNED
+            for item in items
+        )
+
+    def __str__(self):
+        return f'Operasional {self.reservation.code}'
 
 class Payment(models.Model):
     class Status(models.TextChoices):
@@ -513,12 +778,14 @@ class Payment(models.Model):
         verbose_name = 'Pembayaran'
         verbose_name_plural = 'Pembayaran'
         ordering = ['-paid_at']
+
         indexes = [
             models.Index(
                 fields=['status', 'verified_at'],
                 name='pay_status_verified_idx',
             ),
         ]
+
         constraints = [
             models.CheckConstraint(
                 condition=Q(amount__gt=0),
@@ -544,8 +811,9 @@ class HotelSetting(models.Model):
     description = models.TextField(
         'Tentang hotel',
         default=(
-            'RoseHaven adalah hotel bintang 4 dengan pelayanan '
-            'hangat, kamar elegan, dan fasilitas lengkap.'
+            'RoseHaven adalah hotel bintang 4 '
+            'dengan pelayanan hangat, kamar elegan, '
+            'dan fasilitas lengkap.'
         ),
     )
     address = models.TextField(
