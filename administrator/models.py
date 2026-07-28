@@ -148,6 +148,12 @@ class Room(models.Model):
         verbose_name = 'Kamar'
         verbose_name_plural = 'Kamar'
         ordering = ['number']
+        indexes = [
+            models.Index(
+                fields=['status', 'is_active'],
+                name='room_status_active_idx',
+            ),
+        ]
         constraints = [
             models.CheckConstraint(
                 condition=(
@@ -314,6 +320,20 @@ class Reservation(models.Model):
         verbose_name = 'Reservasi'
         verbose_name_plural = 'Reservasi'
         ordering = ['-created_at']
+        indexes = [
+            models.Index(
+                fields=['status', 'check_in'],
+                name='res_status_checkin_idx',
+            ),
+            models.Index(
+                fields=['status', 'check_out'],
+                name='res_status_checkout_idx',
+            ),
+            models.Index(
+                fields=['customer', 'created_at'],
+                name='res_customer_created_idx',
+            ),
+        ]
         constraints = [
             models.CheckConstraint(
                 condition=Q(
@@ -457,6 +477,12 @@ class Payment(models.Model):
         verbose_name = 'Pembayaran'
         verbose_name_plural = 'Pembayaran'
         ordering = ['-paid_at']
+        indexes = [
+            models.Index(
+                fields=['status', 'verified_at'],
+                name='pay_status_verified_idx',
+            ),
+        ]
         constraints = [
             models.CheckConstraint(
                 condition=Q(amount__gt=0),
