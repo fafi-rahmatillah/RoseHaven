@@ -1,3 +1,4 @@
+html
 {% extends 'base_dashboard.html' %}
 {% load rosehaven_tags %}
 
@@ -71,7 +72,7 @@
                 <tr>
                     <td>{{ r.code }}</td>
                     <td>{{ r.customer.get_full_name|default:r.customer.username }}</td>
-                    <td>{{ r|join_rooms }}</td>
+                    <td>{{ r.room.number }}</td>
                     <td>{{ r.check_in|date:'d-m-Y' }}</td>
                     <td>{{ r.check_out|date:'d-m-Y' }}</td>
                     <td>
@@ -91,3 +92,4 @@
     </div>
 </div>
 {% endblock %}
+``` 

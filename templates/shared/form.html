@@ -1,3 +1,4 @@
+```html
 {% extends 'base_dashboard.html' %}
 
 {% block title %}{{ title }}{% endblock %}
@@ -19,7 +20,7 @@
     {% endif %}
 
     {% for field in form %}
-    <div class="form-group {% if field.field.widget.input_type == 'checkbox' %}checkbox-group{% endif %}" data-field="{{ field.name }}">
+    <div class="form-group {% if field.field.widget.input_type == 'checkbox' %}checkbox-group{% endif %}">
         <label>{{ field.label }}</label>
         {{ field }}
 
@@ -34,3 +35,4 @@
     <button class="btn" type="submit">Simpan</button>
 </form>
 {% endblock %}
+```

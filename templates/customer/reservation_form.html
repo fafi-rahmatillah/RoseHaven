@@ -1,19 +1,31 @@
 {% extends 'base_dashboard.html' %}
+
 {% block title %}Reservasi Kamar{% endblock %}
+
 {% block content %}
-<div class="page-title"><div><h1>Reservasi Kamar</h1><p class="muted">Satu reservasi dapat berisi satu atau beberapa kamar.</p></div></div>
-<div class="customer-info-card customer-info-card--compact">
-    <h3>Reservasi Tidak Menunggu Validasi KTP</h3>
-    <p>Customer tetap dapat membuat reservasi walaupun status identitas masih <strong>Menunggu Validasi</strong> atau <strong>Ditolak</strong>.</p>
-    <p>Pemeriksaan KTP asli, persetujuan identitas, dan penerimaan KTP sebagai jaminan dilakukan oleh <strong>resepsionis</strong> sebelum check-in dan sebelum kunci kamar diberikan. KTP dikembalikan setelah check-out serta semua kunci kembali.</p>
+<div class="page-title">
+    <div>
+        <h1>Reservasi Kamar</h1>
+        <p class="muted">Pilih kamar, tanggal check in/check out, dan jumlah tamu.</p>
+    </div>
 </div>
-<form class="form-card" method="post">{% csrf_token %}
-    {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
-    {% for field in form %}<div class="form-group {% if field.field.widget.input_type == 'checkbox' %}checkbox-group{% endif %}"><label>{{ field.label }}</label>{{ field }}{% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}{{ field.errors }}</div>{% endfor %}
-    <button class="btn" type="submit">Buat Reservasi Sekarang</button>
+
+<form class="form-card" method="post">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        {{ form.non_field_errors }}
+    {% endif %}
+
+    {% for field in form %}
+    <div class="form-group">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {{ field.errors }}
+    </div>
+    {% endfor %}
+
+    <button class="btn" type="submit">Simpan Reservasi</button>
 </form>
-<div class="table-card" style="margin-top:24px"><div class="table-head"><h3>Jadwal Kamar</h3></div><div class="table-wrap"><table>
-<thead><tr><th>Kamar</th><th>Tipe</th><th>Tanggal tidak tersedia</th></tr></thead><tbody>
-{% for room in available_rooms %}<tr><td>{{ room.number }} - {{ room.name }}</td><td>{{ room.room_type.name }}</td><td>{% for booking in room.booked_periods %}{{ booking.check_in|date:'d M' }}–{{ booking.check_out|date:'d M Y' }}{% if not forloop.last %}, {% endif %}{% empty %}<span class="text-success">Tersedia</span>{% endfor %}</td></tr>{% endfor %}
-</tbody></table></div></div>
 {% endblock %}
+```

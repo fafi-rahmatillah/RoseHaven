@@ -78,7 +78,7 @@
                 <tr>
                     <td>{{ r.code }}</td>
                     <td>{{ r.customer.get_full_name|default:r.customer.username }}</td>
-                    <td>{{ r|join_rooms }}</td>
+                    <td>{{ r.room.number }}</td>
                     <td>{{ r.check_in|date:'d-m-Y' }}</td>
                     <td>
                         <span class="badge badge-{{ r.status|status_class }}">

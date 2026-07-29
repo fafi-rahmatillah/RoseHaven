@@ -1,4 +1,56 @@
-{% extends 'base_dashboard.html' %}{% load rosehaven_tags %}{% block title %}Check In{% endblock %}{% block content %}
-<div class="page-title"><div><h1>Check In Tamu</h1><p class="muted">Check-in hanya dapat dilakukan setelah pembayaran, identitas, dan jaminan KTP lengkap.</p></div></div>
-<div class="table-card"><div class="table-wrap"><table><thead><tr><th>Kode</th><th>Customer</th><th>Kamar</th><th>Identitas</th><th>Jaminan KTP</th><th>Aksi</th></tr></thead><tbody>{% for r in reservations %}<tr><td>{{ r.code }}</td><td>{{ r.customer.get_full_name|default:r.customer.username }}</td><td>{{ r|join_rooms }}</td><td><span class="badge badge-{{ r.customer.customer_profile.identity_status|status_class }}">{{ r.customer.customer_profile.get_identity_status_display }}</span></td><td><span class="badge badge-{{ r.stay_record.ktp_status|status_class }}">{{ r.stay_record.get_ktp_status_display }}</span></td><td><a class="btn btn-sm" href="{% url 'resepsionis:reservation_detail' r.pk %}">Proses Detail</a></td></tr>{% empty %}<tr><td colspan="6" class="empty">Tidak ada reservasi siap check-in.</td></tr>{% endfor %}</tbody></table></div></div>
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+
+{% block title %}Check In{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <div>
+        <h1>Check In Tamu</h1>
+        <p class="muted">Reservasi yang telah dibayar atau dikonfirmasi.</p>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Kode</th>
+                    <th>Customer</th>
+                    <th>Kamar</th>
+                    <th>Tanggal Check In</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for r in reservations %}
+                <tr>
+                    <td>{{ r.code }}</td>
+                    <td>{{ r.customer.get_full_name|default:r.customer.username }}</td>
+                    <td>{{ r.room.number }} - {{ r.room.name }}</td>
+                    <td>{{ r.check_in|date:'d M Y' }}</td>
+                    <td>
+                        <span class="badge badge-{{ r.status|status_class }}">
+                            {{ r.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'resepsionis:check_in_action' r.pk %}">
+                            {% csrf_token %}
+                            <button class="btn btn-sm" type="submit">Proses Check In</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty">Tidak ada reservasi siap check in.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

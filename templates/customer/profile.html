@@ -10,14 +10,13 @@
     </div>
 </div>
 
-<form class="form-card" method="post" enctype="multipart/form-data">
+<form class="form-card" method="post">
     {% csrf_token %}
 
     {% for field in form %}
-    <div class="form-group {% if field.field.widget.input_type == 'checkbox' %}checkbox-group{% endif %}" data-field="{{ field.name }}">
+    <div class="form-group">
         <label>{{ field.label }}</label>
         {{ field }}
-        {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
         {{ field.errors }}
     </div>
     {% endfor %}

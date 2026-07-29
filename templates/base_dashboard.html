@@ -8,6 +8,7 @@
     <title>{% block title %}Dashboard RoseHaven{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
+
 <body>
     <div class="dashboard-shell">
         <aside class="sidebar">
@@ -17,7 +18,13 @@
             </a>
 
             <div class="role-label">
-                {% if is_administrator %}Administrator{% elif is_resepsionis %}Resepsionis{% else %}Customer{% endif %}
+                {% if is_administrator %}
+                Administrator
+                {% elif is_resepsionis %}
+                Resepsionis
+                {% else %}
+                Customer
+                {% endif %}
             </div>
 
             <nav class="side-menu">
@@ -37,8 +44,6 @@
                 <a href="{% url 'resepsionis:dashboard' %}">▦ Dashboard</a>
                 <a href="{% url 'resepsionis:reservation_list' %}">▤ Data Reservasi</a>
                 <a href="{% url 'resepsionis:customer_list' %}">♙ Data Customer</a>
-                <a href="{% url 'resepsionis:identity_list' %}">✓ Validasi Identitas</a>
-                <a href="{% url 'resepsionis:ktp_guarantee_list' %}">◇ Jaminan KTP</a>
                 <a href="{% url 'resepsionis:room_list' %}">▣ Data Kamar</a>
                 <a href="{% url 'resepsionis:payment_list' %}">◈ Konfirmasi Pembayaran</a>
                 <a href="{% url 'resepsionis:check_in_list' %}">↳ Check In</a>
@@ -63,13 +68,25 @@
         <main class="main">
             <header class="topbar">
                 <button class="mobile-sidebar-toggle">☰</button>
+
                 <h2>{% block topbar %}RoseHaven Management{% endblock %}</h2>
+
                 <div class="user-badge">
-                    <div class="avatar">{{ user.first_name|default:user.username|slice:':1'|upper }}</div>
+                    <div class="avatar">
+                        {{ user.first_name|default:user.username|slice:':1'|upper }}
+                    </div>
+
                     <div>
                         <strong>{{ user.get_full_name|default:user.username }}</strong>
+
                         <div class="muted" style="font-size:.78rem">
-                            {% if is_administrator %}Administrator{% elif is_resepsionis %}Resepsionis{% else %}Customer{% endif %}
+                            {% if is_administrator %}
+                            Administrator
+                            {% elif is_resepsionis %}
+                            Resepsionis
+                            {% else %}
+                            Customer
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -77,13 +94,21 @@
 
             {% if messages %}
             <div class="alerts">
-                {% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
             </div>
             {% endif %}
 
-            <div class="content">{% block content %}{% endblock %}</div>
+            <div class="content">
+                {% block content %}
+                {% endblock %}
+            </div>
         </main>
     </div>
+
     <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

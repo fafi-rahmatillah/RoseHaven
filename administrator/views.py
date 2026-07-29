@@ -10,7 +10,6 @@ from customer.models import CustomerProfile
 from resepsionis.models import ReceptionistProfile
 from rosehaven.decorators import role_required
 from rosehaven.utils import apply_validation_error
-from rosehaven.reservation_services import sync_reservation_rooms
 from .forms import (
     FacilityForm, HotelSettingForm, PaymentAdminForm, ReservationAdminForm,
     RoomForm, RoomTypeForm, UserAccountForm,
@@ -48,7 +47,7 @@ def dashboard(request):
         'today_reservations': Reservation.objects.filter(created_at__date=today).count(),
         'today_checkins': Reservation.objects.filter(check_in=today).count(),
         'today_checkouts': Reservation.objects.filter(check_out=today).count(),
-        'recent': Reservation.objects.select_related('customer', 'room').prefetch_related('reserved_rooms__room')[:8],
+        'recent': Reservation.objects.select_related('customer', 'room')[:8],
         'status_summary': Reservation.objects.values('status').annotate(total=Count('id')).order_by('status'),
     }
     return render(request, 'administrator/dashboard.html', context)
@@ -193,7 +192,7 @@ def customer_delete(request, pk):
 
 @ADMIN_ONLY
 def reservation_list(request):
-    qs = Reservation.objects.select_related('customer', 'room').prefetch_related('reserved_rooms__room')
+    qs = Reservation.objects.select_related('customer', 'room')
     status = request.GET.get('status', '')
     if status:
         qs = qs.filter(status=status)
@@ -206,11 +205,10 @@ def reservation_form(request, pk=None):
     form = ReservationAdminForm(request.POST or None, instance=obj)
     if request.method == 'POST' and form.is_valid():
         reservation = form.save(commit=False)
-        rooms = list(form.cleaned_data['rooms'])
-        reservation.room = rooms[0]
         reservation.created_by = reservation.created_by or request.user
         try:
-            sync_reservation_rooms(reservation, rooms)
+            reservation.full_clean()
+            reservation.save()
         except Exception as exc:
             apply_validation_error(form, exc)
         else:
@@ -231,10 +229,7 @@ def reservation_delete(request, pk):
 
 @ADMIN_ONLY
 def payment_list(request):
-    payments = (
-        Payment.objects.select_related('reservation', 'reservation__customer', 'verified_by')
-        .prefetch_related('reservation__reserved_rooms__room')
-    )
+    payments = Payment.objects.select_related('reservation', 'reservation__customer', 'verified_by')
     return render(request, 'administrator/payment_list.html', {'payments': payments})
 
 
@@ -296,14 +291,9 @@ def receptionist_delete(request, pk):
     return render(request, 'shared/confirm_delete.html', {'object': obj, 'title': 'Hapus Resepsionis', 'back_url': 'administrator:receptionist_list'})
 
 
-
-
 @ADMIN_ONLY
 def reports(request):
-    reservations, start, end = _date_filters(
-        request,
-        Reservation.objects.select_related('customer', 'room').prefetch_related('reserved_rooms__room'),
-    )
+    reservations, start, end = _date_filters(request, Reservation.objects.select_related('customer', 'room'))
     payments, _, _ = _date_filters(request, Payment.objects.select_related('reservation').filter(status=Payment.Status.VERIFIED), 'verified_at')
     context = {
         'reservations': reservations,
