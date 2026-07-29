@@ -7,3 +7,6 @@ media/payment_proofs/*
 !media/payment_proofs/.gitkeep
 db.sqlite3
 *.sqlite3
+
+# Database demo untuk pemeriksaan dosen
+!db.sqlite3
