@@ -1,0 +1,26 @@
+{% extends 'base_dashboard.html' %}{% load rosehaven_tags %}
+{% block title %}Operasional Reservasi{% endblock %}
+{% block content %}
+<div class="page-title"><div><h1>Operasional Reservasi</h1><p class="muted">{{ reservation.code }} · {{ reservation.customer.get_full_name|default:reservation.customer.username }}</p></div><span class="badge badge-{{ reservation.status|status_class }}">{{ reservation.get_status_display }}</span></div>
+<div class="info-panel"><strong>Validasi identitas dan jaminan KTP sekarang dikerjakan resepsionis.</strong> Customer tetap boleh reservasi lebih dahulu; syarat tersebut diperiksa sebelum check-in dan penyerahan kunci.</div>
+<div class="grid grid-2">
+<div class="card"><div class="card-body"><h2>Persyaratan Check-in</h2>
+<div class="detail-grid">
+<div class="detail-item"><small>Identitas</small><strong>{{ reservation.customer.customer_profile.get_identity_status_display }}</strong></div>
+<div class="detail-item"><small>Jaminan KTP</small><strong>{{ stay_record.get_ktp_status_display }}</strong></div>
+<div class="detail-item"><small>Pembayaran</small><strong>{% if reservation.payment %}{{ reservation.payment.get_status_display }}{% else %}Belum ada{% endif %}</strong></div>
+<div class="detail-item"><small>Tanggal</small><strong>{{ reservation.check_in|date:'d M Y' }}–{{ reservation.check_out|date:'d M Y' }}</strong></div>
+</div>
+<div class="actions" style="margin-top:16px">
+<a class="btn btn-outline btn-sm" href="{% url 'resepsionis:identity_detail' reservation.customer.customer_profile.pk %}">Kelola Validasi Identitas</a>
+{% if stay_record.ktp_status == 'NOT_RECEIVED' %}<a class="btn btn-sm" href="{% url 'resepsionis:receive_ktp' reservation.pk %}">Terima KTP sebagai Jaminan</a>{% endif %}
+{% if stay_record.ktp_status == 'HELD' and reservation.status == 'CHECKED_OUT' %}<a class="btn btn-gold btn-sm" href="{% url 'resepsionis:return_ktp' reservation.pk %}">Kembalikan KTP</a>{% endif %}
+</div>
+{% if reservation.status == 'CONFIRMED' %}<form method="post" action="{% url 'resepsionis:check_in_action' reservation.pk %}" style="margin-top:16px">{% csrf_token %}<button class="btn" type="submit">Check-in dan Serahkan Semua Kunci</button></form>{% endif %}
+</div></div>
+<div class="card"><div class="card-body"><h2>Data Kunci per Kamar</h2>
+{% for item in reservation.reserved_rooms.all %}<div class="key-row"><div><strong>Kamar {{ item.room.number }} - {{ item.room.name }}</strong><div>Status: <span class="badge badge-{{ item.key_status|status_class }}">{{ item.get_key_status_display }}</span></div>{% if item.key_given_at %}<small>Diberikan {{ item.key_given_at|date:'d M Y H:i' }} oleh {% if item.key_given_by %}{{ item.key_given_by.get_full_name|default:item.key_given_by.username }}{% else %}resepsionis{% endif %}</small>{% endif %}{% if item.key_returned_at %}<small>Dikembalikan {{ item.key_returned_at|date:'d M Y H:i' }}</small>{% endif %}</div>{% if reservation.status == 'CHECKED_IN' %}<form method="post" action="{% url 'resepsionis:key_return_action' item.pk %}" class="key-form">{% csrf_token %}<select name="status"><option value="RETURNED">Kunci dikembalikan</option><option value="PROBLEM">Hilang/bermasalah</option></select><input name="notes" placeholder="Catatan kondisi kunci"><button class="btn btn-sm" type="submit">Simpan</button></form>{% endif %}</div>{% empty %}<p class="muted">Belum ada kamar reservasi.</p>{% endfor %}
+{% if reservation.status == 'CHECKED_IN' %}<form method="post" action="{% url 'resepsionis:check_out_action' reservation.pk %}" style="margin-top:18px">{% csrf_token %}<button class="btn btn-gold" type="submit">Selesaikan Check-out</button></form>{% endif %}
+</div></div>
+</div>
+{% endblock %}

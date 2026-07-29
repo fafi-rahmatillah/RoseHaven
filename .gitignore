@@ -6,3 +6,4 @@ staticfiles/
 media/payment_proofs/*
 !media/payment_proofs/.gitkeep
 db.sqlite3
+*.sqlite3

@@ -1,44 +1,10 @@
 {% extends 'base_dashboard.html' %}
-
+{% load rosehaven_tags %}
 {% block title %}Data Customer{% endblock %}
-
 {% block content %}
-<div class="page-title">
-    <div>
-        <h1>Data Customer</h1>
-        <p class="muted">Data pelanggan yang dapat dilihat oleh resepsionis.</p>
-    </div>
-</div>
-
-<div class="table-card">
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>Nama</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>No. HP</th>
-                    <th>Alamat</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for u in users %}
-                <tr>
-                    <td>{{ u.get_full_name|default:'-' }}</td>
-                    <td>{{ u.username }}</td>
-                    <td>{{ u.email }}</td>
-                    <td>{{ u.customer_profile.phone|default:'-' }}</td>
-                    <td>{{ u.customer_profile.address|default:'-' }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="empty">Belum ada customer.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+<div class="page-title"><div><h1>Data Customer</h1><p class="muted">Resepsionis dapat melihat data customer sekaligus membuka proses validasi identitas.</p></div></div>
+<div class="table-card"><div class="table-wrap"><table>
+<thead><tr><th>Nama</th><th>Email</th><th>No. HP</th><th>NIK</th><th>Status Identitas</th><th>Aksi</th></tr></thead>
+<tbody>{% for u in users %}<tr><td>{{ u.get_full_name|default:'-' }}</td><td>{{ u.email }}</td><td>{{ u.customer_profile.phone|default:'-' }}</td><td>{{ u.customer_profile.masked_nik }}</td><td><span class="badge badge-{{ u.customer_profile.identity_status|status_class }}">{{ u.customer_profile.get_identity_status_display }}</span></td><td><a class="btn btn-sm" href="{% url 'resepsionis:identity_detail' u.customer_profile.pk %}">Validasi</a></td></tr>{% empty %}<tr><td colspan="6" class="empty">Belum ada customer.</td></tr>{% endfor %}</tbody>
+</table></div></div>
 {% endblock %}
