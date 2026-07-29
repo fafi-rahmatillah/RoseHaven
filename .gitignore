@@ -6,3 +6,7 @@ staticfiles/
 media/payment_proofs/*
 !media/payment_proofs/.gitkeep
 db.sqlite3
+
+__pycache__/
+*.py[cod]
+*.sqlite3

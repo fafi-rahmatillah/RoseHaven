@@ -1,0 +1,11 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Proses Validasi Identitas{% endblock %}
+{% block content %}
+<div class="page-title"><div><h1>Validasi Identitas</h1><p class="muted">{{ profile.user.get_full_name|default:profile.user.username }} · NIK {{ profile.masked_nik }}</p></div></div>
+<form method="post" class="form-card">{% csrf_token %}
+    {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
+    {% for field in form %}<div class="form-group"><label>{{ field.label }}</label>{{ field }}{% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}{{ field.errors }}</div>{% endfor %}
+    <button class="btn" type="submit">Simpan Hasil Validasi</button>
+    <a class="btn btn-secondary" href="{% url 'resepsionis:identity_detail' profile.pk %}">Kembali</a>
+</form>
+{% endblock %}

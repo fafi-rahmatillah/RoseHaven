@@ -17,16 +17,8 @@ class CustomerProfile(models.Model):
         on_delete=models.CASCADE,
         related_name='customer_profile',
     )
-
-    phone = models.CharField(
-        'No. HP',
-        max_length=30,
-    )
-
-    address = models.TextField(
-        'Alamat',
-    )
-
+    phone = models.CharField('No. HP', max_length=30)
+    address = models.TextField('Alamat')
     nik = models.CharField(
         'NIK',
         max_length=16,
@@ -35,38 +27,32 @@ class CustomerProfile(models.Model):
         blank=True,
         help_text='NIK terdiri dari 16 digit dan digunakan untuk validasi identitas.',
     )
-
     is_married = models.BooleanField(
         'Sudah menikah',
         default=False,
     )
-
     marriage_certificate = models.FileField(
         'Bukti surat nikah',
         upload_to='identity_documents/marriage/',
         blank=True,
         help_text='Wajib bagi customer yang memilih status sudah menikah.',
     )
-
     identity_status = models.CharField(
         'Status validasi identitas',
         max_length=20,
         choices=IdentityStatus.choices,
         default=IdentityStatus.PENDING,
     )
-
     identity_method = models.CharField(
         'Metode pemeriksaan identitas',
         max_length=20,
         choices=IdentityMethod.choices,
         blank=True,
     )
-
     identity_notes = models.TextField(
         'Catatan pemeriksaan',
         blank=True,
     )
-
     verified_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -75,7 +61,6 @@ class CustomerProfile(models.Model):
         related_name='verified_customers',
         verbose_name='Diverifikasi oleh',
     )
-
     verified_at = models.DateTimeField(
         'Waktu verifikasi',
         null=True,
@@ -85,27 +70,17 @@ class CustomerProfile(models.Model):
     class Meta:
         verbose_name = 'Profil customer'
         verbose_name_plural = 'Profil customer'
-
         indexes = [
-            models.Index(
-                fields=['identity_status'],
-                name='cust_identity_status_idx',
-            ),
+            models.Index(fields=['identity_status'], name='cust_identity_status_idx'),
         ]
 
     @property
     def masked_nik(self):
         if not self.nik:
             return '-'
-
         if len(self.nik) <= 4:
             return self.nik
-
-        return (
-            f'{self.nik[:2]}'
-            f'{"*" * (len(self.nik) - 4)}'
-            f'{self.nik[-2:]}'
-        )
+        return f'{self.nik[:2]}{"*" * (len(self.nik) - 4)}{self.nik[-2:]}'
 
     @property
     def identity_is_verified(self):
