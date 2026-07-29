@@ -31,7 +31,7 @@
                 <tr>
                     <td>{{ p.reservation.code }}</td>
                     <td>{{ p.reservation.customer.get_full_name|default:p.reservation.customer.username }}</td>
-                    <td>{{ p.reservation.room.number }}</td>
+                    <td>{{ p.reservation|join_rooms }}</td>
                     <td>{{ p.amount|rupiah }}</td>
                     <td>
                         {% if p.proof %}

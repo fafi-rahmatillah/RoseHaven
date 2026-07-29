@@ -1,0 +1,18 @@
+{% extends 'base_dashboard.html' %}
+{% load rosehaven_tags %}
+{% block title %}Validasi Identitas{% endblock %}
+{% block content %}
+<div class="page-title">
+    <div><h1>Validasi Identitas Customer</h1><p class="muted">Pemeriksaan NIK, KTP asli, dan surat nikah dilakukan langsung oleh resepsionis.</p></div>
+</div>
+<div class="table-card"><div class="table-wrap"><table>
+<thead><tr><th>Nama</th><th>NIK</th><th>Surat Nikah</th><th>Status</th><th>Diperiksa Oleh</th><th>Aksi</th></tr></thead>
+<tbody>{% for p in profiles %}<tr>
+<td>{{ p.user.get_full_name|default:p.user.username }}</td><td>{{ p.masked_nik }}</td>
+<td>{% if p.is_married %}{% if p.marriage_certificate %}Ada{% else %}Belum ada{% endif %}{% else %}Tidak wajib{% endif %}</td>
+<td><span class="badge badge-{{ p.identity_status|status_class }}">{{ p.get_identity_status_display }}</span></td>
+<td>{% if p.verified_by %}{{ p.verified_by.get_full_name|default:p.verified_by.username }}{% else %}-{% endif %}</td>
+<td><a class="btn btn-sm" href="{% url 'resepsionis:identity_detail' p.pk %}">Periksa</a></td>
+</tr>{% empty %}<tr><td colspan="6" class="empty">Belum ada customer.</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% endblock %}
