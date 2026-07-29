@@ -12,28 +12,18 @@
     <a class="btn" href="{% url 'resepsionis:walk_in_add' %}">＋ Tambah Reservasi</a>
 </div>
 
-<form class="filter-bar" method="get" id="statusFilterForm">
+<form class="filter-bar" method="get">
     <div class="form-group">
         <label>Status</label>
-
-        <select name="status" id="statusSelect">
+        <select name="status">
             <option value="">Semua Status</option>
-
             {% for value,label in statuses %}
-            <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>
-                {{ label }}
-            </option>
+            <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
-
         </select>
     </div>
+    <button class="btn" type="submit">Filter</button>
 </form>
-
-<script>
-    document.getElementById('statusSelect').addEventListener('change', function() {
-        document.getElementById('statusFilterForm').submit();
-    });
-</script>
 
 <div class="table-card">
     <div class="table-wrap">

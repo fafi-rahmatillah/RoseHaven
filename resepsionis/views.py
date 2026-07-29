@@ -6,11 +6,6 @@ from rosehaven.decorators import role_required
 from rosehaven.utils import apply_validation_error
 from administrator.models import Payment, Reservation, Room
 from .forms import PaymentVerificationForm, WalkInReservationForm
-from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
-from customer.models import CustomerProfile
-from .forms import IdentityVerificationForm
-from django.contrib.auth.decorators import login_required
 
 STAFF_ONLY = role_required('Resepsionis')
 
@@ -144,54 +139,3 @@ def check_out_action(request, pk):
 def schedule(request):
     reservations = Reservation.objects.select_related('customer', 'room').exclude(status=Reservation.Status.CANCELED).order_by('check_in', 'room__number')
     return render(request, 'resepsionis/schedule.html', {'reservations': reservations})
-
-@login_required
-@role_required('Resepsionis')
-def identity_list(request):
-    profiles = CustomerProfile.objects.select_related(
-        'user'
-    ).filter(
-        identity_status='pending'
-    ).order_by('user__first_name')
-    return render(
-        request,
-        'resepsionis/identity_list.html',
-        {
-            'profiles': profiles,
-        },
-    )
-
-@login_required
-@role_required('Resepsionis')
-def identity_verify(request, profile_id):
-    profile = get_object_or_404(
-        CustomerProfile,
-        id=profile_id,
-    )
-    form = IdentityVerificationForm(
-        request.POST or None
-    )
-    if request.method == 'POST' and form.is_valid():
-        profile.identity_status = form.cleaned_data['decision']
-        profile.identity_method = form.cleaned_data[
-            'identity_method'
-        ]
-        profile.identity_notes = form.cleaned_data[
-            'identity_notes'
-        ]
-        profile.verified_by = request.user
-        profile.verified_at = timezone.now()
-        profile.save()
-        messages.success(
-            request,
-            'Status validasi identitas berhasil diperbarui.',
-        )
-        return redirect('resepsionis:identity_list')
-    return render(
-        request,
-        'resepsionis/identity_verify.html',
-        {
-            'profile': profile,
-            'form': form,
-        },
-    )
